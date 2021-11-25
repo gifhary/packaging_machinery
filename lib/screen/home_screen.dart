@@ -442,11 +442,25 @@ class HomeScreen extends StatelessWidget {
                                 ),
                                 hintText: 'Message',
                               ),
-                            )
+                            ),
                           ],
                         ),
-                      )
+                      ),
                     ],
+                  ),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      primary: const Color.fromRGBO(46, 45, 42, 1),
+                    ),
+                    onPressed: () {},
+                    child: const Text('Submit'),
+                  ),
+                  const Text(
+                    'Thanks for sumbitting!',
+                    style: TextStyle(
+                      color: Color.fromRGBO(117, 111, 99, 1),
+                    ),
                   ),
                 ],
               ),
