@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:packaging_machinery/screen/home_screen.dart';
+import 'package:get/get.dart';
+import 'package:packaging_machinery/route/app_route.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 
 void main() => runApp(const MyApp());
 
@@ -8,10 +10,11 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
+    return GetMaterialApp(
       title: 'Packaging Machinery',
-      home: HomeScreen(),
+      getPages: AppRoute.all,
+      initialRoute: RouteConstant.home,
+      debugShowCheckedModeBanner: false,
     );
   }
 }

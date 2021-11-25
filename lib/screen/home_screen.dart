@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/utils/texts.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -37,7 +39,7 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             InkWell(
-              onTap: () {},
+              onTap: () => Get.to(RouteConstant.login),
               child: Row(
                 children: const [
                   CircleAvatar(
