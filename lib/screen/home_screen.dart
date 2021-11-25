@@ -7,6 +7,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       //navigation bar
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
@@ -257,6 +258,100 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             //section 6
+            Padding(
+              padding: const EdgeInsets.all(100),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Image.asset('assets/img/banner_6.png'),
+                  Column(
+                    children: [
+                      const Text(
+                        'Sustainable',
+                        style: TextStyle(
+                            fontSize: 40,
+                            color: Color.fromRGBO(117, 111, 99, 1)),
+                      ),
+                      const Text(
+                        'BIODEGRADABLE PET & GLASS CONTAINER',
+                        style: TextStyle(
+                            fontSize: 15,
+                            color: Color.fromRGBO(117, 111, 99, 1)),
+                      ),
+                      const SizedBox(height: 20),
+                      Container(
+                        color: const Color.fromRGBO(117, 111, 99, 1),
+                        width: 125,
+                        height: 1,
+                      ),
+                      const SizedBox(height: 45),
+                      SizedBox(
+                        width: 400,
+                        child: Text(
+                          Texts.sustainable,
+                          maxLines: null,
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: Color.fromRGBO(117, 111, 99, 1),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                ],
+              ),
+            ),
+            //contact me
+            Container(
+              padding: const EdgeInsets.all(50),
+              width: double.infinity,
+              color: const Color.fromRGBO(244, 243, 242, 1),
+              child: Column(
+                children: [
+                  const Text('Contact Me',
+                      style: TextStyle(
+                          fontSize: 40,
+                          color: Color.fromRGBO(117, 111, 99, 1))),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'PHONE: +49 40 67907 0 / FAX: +49 40 67907 270',
+                    style: TextStyle(
+                        fontSize: 15, color: Color.fromRGBO(117, 111, 99, 1)),
+                  ),
+                  const SizedBox(height: 30),
+                  Container(
+                    color: const Color.fromRGBO(117, 111, 99, 1),
+                    width: 125,
+                    height: 1,
+                  ),
+                  const SizedBox(height: 30),
+                  const Text(
+                    'KHS GmbH - Site Hamburg',
+                    style: TextStyle(
+                      color: Color.fromRGBO(117, 111, 99, 1),
+                    ),
+                  ),
+                  const Text(
+                    'Meiendorfer Strasse 203',
+                    style: TextStyle(
+                      color: Color.fromRGBO(117, 111, 99, 1),
+                    ),
+                  ),
+                  const Text(
+                    '22145 Hamburg',
+                    style: TextStyle(
+                      color: Color.fromRGBO(117, 111, 99, 1),
+                    ),
+                  ),
+                  const Text(
+                    'Germany',
+                    style: TextStyle(
+                      color: Color.fromRGBO(117, 111, 99, 1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ],
         ),
       ),
