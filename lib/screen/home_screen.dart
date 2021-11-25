@@ -4,10 +4,42 @@ import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/utils/texts.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  final bool? login;
+  HomeScreen({Key? key, this.login = false}) : super(key: key);
+
+  final List<String> _popupMenu = [
+    'My Wallet',
+    'My Bookings',
+    'My Archive',
+    'My Account',
+    'Log Out'
+  ];
+
+  final GlobalKey _key = GlobalKey();
 
   @override
   Widget build(BuildContext context) {
+    double _width = MediaQuery.of(context).size.width;
+    double _height = MediaQuery.of(context).size.height;
+
+    Future<void> _popUp() async {
+      RenderBox _box = _key.currentContext!.findRenderObject() as RenderBox;
+      Offset offset = _box.localToGlobal(Offset.zero);
+
+      await showMenu(
+          context: context,
+          position: RelativeRect.fromLTRB(
+              offset.dx + _box.size.width,
+              offset.dy + _box.size.height + 10,
+              _width - 50 - (offset.dx + _box.size.width),
+              _height - (offset.dy + _box.size.height)),
+          items: _popupMenu
+              .map((e) => PopupMenuItem<String>(
+                    child: Text(e),
+                  ))
+              .toList());
+    }
+
     return Scaffold(
       backgroundColor: Colors.white,
       //navigation bar
@@ -39,7 +71,14 @@ class HomeScreen extends StatelessWidget {
               ],
             ),
             InkWell(
-              onTap: () => Get.to(RouteConstant.login),
+              key: _key,
+              onTap: () {
+                if (login ?? false) {
+                  Get.toNamed(RouteConstant.login);
+                } else {
+                  _popUp();
+                }
+              },
               child: Row(
                 children: const [
                   CircleAvatar(

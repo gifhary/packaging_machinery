@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 
 class LoginScreen extends StatelessWidget {
   const LoginScreen({Key? key}) : super(key: key);
@@ -19,7 +21,7 @@ class LoginScreen extends StatelessWidget {
             children: [
               const Text('New to this site? '),
               InkWell(
-                onTap: () {},
+                onTap: () => Get.toNamed(RouteConstant.register),
                 child: const Text(
                   'Sign Up',
                   style: TextStyle(color: Color.fromRGBO(117, 111, 99, 1)),
