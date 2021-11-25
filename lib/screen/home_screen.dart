@@ -349,9 +349,119 @@ class HomeScreen extends StatelessWidget {
                       color: Color.fromRGBO(117, 111, 99, 1),
                     ),
                   ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 400,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 9),
+                              child: Text('Enter Your Name*'),
+                            ),
+                            TextField(
+                              decoration: InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                hintText: 'Name',
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 9),
+                              child: Text('Enter Your Email*'),
+                            ),
+                            TextField(
+                              decoration: InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                hintText: 'Email',
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 9),
+                              child: Text('Enter Your Subject*'),
+                            ),
+                            TextField(
+                              decoration: InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                hintText: 'Subject',
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(width: 20),
+                      SizedBox(
+                        width: 400,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: const [
+                            Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8),
+                              child: Text('Enter Your Message*'),
+                            ),
+                            TextField(
+                              maxLines: 10,
+                              decoration: InputDecoration(
+                                focusedBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                enabledBorder: OutlineInputBorder(
+                                  borderSide: BorderSide(
+                                      color: Color.fromRGBO(117, 111, 99, 1),
+                                      width: 1),
+                                ),
+                                hintText: 'Message',
+                              ),
+                            )
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ],
               ),
             ),
+            Container(
+              color: const Color.fromRGBO(117, 111, 99, 1),
+              width: double.infinity,
+              height: 43,
+              child: const Center(
+                child: Text(
+                  '©2022 by Samantha Tiara W. Master\'s Thesis Project - EM.',
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            )
           ],
         ),
       ),
