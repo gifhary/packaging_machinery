@@ -10,6 +10,7 @@ class BookNowScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
         title: const AppBarWidget(),
       ),
