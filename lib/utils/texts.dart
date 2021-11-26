@@ -7,4 +7,6 @@ class Texts {
       '"We explore all possible ways and means of cutting emissions and saving on resources in the course of our own value creation process."';
   static String sustainable =
       'The FreshSafe PET® coating system provides convincing freshness and quality protection for juices, carbonated beverages, wine or sauces and dressings in PET bottles, for instance. The system also facilitates full bottle-to-bottle recyclability.';
+  static String sparePartsOrder =
+      'Book several orders to be delivered at the same time or immediately place your order.';
 }

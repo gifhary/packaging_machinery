@@ -20,9 +20,9 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const AppBarWidget(),
       ),
       body: SingleChildScrollView(
-        //section 1
         child: Column(
           children: [
+            //section 1
             Stack(
               alignment: AlignmentDirectional.center,
               children: [
