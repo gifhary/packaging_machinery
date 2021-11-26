@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/utils/texts.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 
@@ -10,6 +12,25 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (Get.arguments?['contactUs'] ?? false) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
+        Future.delayed(const Duration(seconds: 1), () {
+          _scrollToBottom();
+        });
+      });
+    }
+  }
+
+  _scrollToBottom() {
+    _scrollController.animateTo(_scrollController.position.maxScrollExtent,
+        duration: const Duration(milliseconds: 1000), curve: Curves.ease);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,9 +38,10 @@ class _HomeScreenState extends State<HomeScreen> {
       //navigation bar
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
-        title: const AppBarWidget(),
+        title: AppBarWidget(onContactUs: _scrollToBottom),
       ),
       body: SingleChildScrollView(
+        controller: _scrollController,
         child: Column(
           children: [
             //section 1
@@ -61,7 +83,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     InkWell(
-                      onTap: () {},
+                      onTap: () => Get.offNamed(RouteConstant.bookOnline),
                       child: const Text(
                         'BOOK ONLINE',
                         style: TextStyle(
@@ -274,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
               color: const Color.fromRGBO(244, 243, 242, 1),
               child: Column(
                 children: [
-                  const Text('Contact Me',
+                  const Text('Contact Us',
                       style: TextStyle(
                           fontSize: 40,
                           color: Color.fromRGBO(117, 111, 99, 1))),
@@ -441,7 +463,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

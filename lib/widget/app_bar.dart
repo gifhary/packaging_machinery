@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
 
 class AppBarWidget extends StatefulWidget {
-  const AppBarWidget({Key? key}) : super(key: key);
+  final VoidCallback? onContactUs;
+  const AppBarWidget({Key? key, this.onContactUs}) : super(key: key);
 
   @override
   State<AppBarWidget> createState() => _AppBarWidgetState();
@@ -21,7 +23,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
 
   final GlobalKey _key = GlobalKey();
 
-  bool _loggedIn = false;
+  User? _user;
 
   @override
   void initState() {
@@ -31,7 +33,16 @@ class _AppBarWidgetState extends State<AppBarWidget> {
 
   _checkLoginStatus() {
     GetStorage box = GetStorage();
-    _loggedIn = box.read('user') ?? false;
+    _user = box.read('user');
+  }
+
+  _contactUs() {
+    String currentRoute = Get.currentRoute;
+    if (currentRoute == RouteConstant.home) {
+      widget.onContactUs!();
+    } else {
+      Get.offNamed(RouteConstant.home, arguments: {'contactUs': true});
+    }
   }
 
   @override
@@ -77,7 +88,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
               width: 20,
             ),
             InkWell(
-              onTap: () {},
+              onTap: _contactUs,
               child: const Text('CONTACT US'),
             ),
           ],
@@ -85,21 +96,21 @@ class _AppBarWidgetState extends State<AppBarWidget> {
         InkWell(
           key: _key,
           onTap: () {
-            if (!_loggedIn) {
+            if (_user == null) {
               Get.toNamed(RouteConstant.login);
             } else {
               _popUp();
             }
           },
           child: Row(
-            children: const [
-              CircleAvatar(
+            children: [
+              const CircleAvatar(
                 backgroundImage: AssetImage('assets/img/blank_profile.png'),
               ),
-              SizedBox(
+              const SizedBox(
                 width: 20,
               ),
-              Text('Log In'),
+              Text(_user == null ? 'Log In' : _user!.email),
             ],
           ),
         ),

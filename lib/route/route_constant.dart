@@ -3,4 +3,5 @@ class RouteConstant {
   static const login = '/login';
   static const register = '/register';
   static const bookOnline = '/bookOnline';
+  static const bookNow = '/bookNow';
 }

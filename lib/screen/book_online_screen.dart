@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/utils/texts.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 
@@ -12,6 +14,7 @@ class BookOnlineScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
           title: const AppBarWidget()),
       body: SingleChildScrollView(
@@ -65,7 +68,8 @@ class BookOnlineScreen extends StatelessWidget {
                                     primary:
                                         const Color.fromRGBO(160, 152, 128, 1),
                                   ),
-                                  onPressed: () {},
+                                  onPressed: () =>
+                                      Get.toNamed(RouteConstant.bookNow),
                                   child: const Text('BOOK NOW'),
                                 ),
                                 const SizedBox(width: 30),
@@ -112,7 +116,7 @@ class BookOnlineScreen extends StatelessWidget {
                   style: TextStyle(color: Colors.white),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),

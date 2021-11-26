@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+import 'package:packaging_machinery/screen/book_now_screen.dart';
 import 'package:packaging_machinery/screen/book_online_screen.dart';
 import 'package:packaging_machinery/screen/home_screen.dart';
 import 'package:packaging_machinery/screen/login_screen.dart';
@@ -12,6 +13,7 @@ class AppRoute {
     GetPage(name: RouteConstant.login, page: () => const LoginScreen()),
     GetPage(name: RouteConstant.register, page: () => const RegisterScreen()),
     GetPage(
-        name: RouteConstant.bookOnline, page: () => const BookOnlineScreen())
+        name: RouteConstant.bookOnline, page: () => const BookOnlineScreen()),
+    GetPage(name: RouteConstant.bookNow, page: () => const BookNowScreen()),
   ];
 }
