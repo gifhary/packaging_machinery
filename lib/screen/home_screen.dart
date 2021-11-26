@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:get/get.dart';
-import 'package:get_storage/get_storage.dart';
-import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/utils/texts.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 
@@ -13,19 +10,6 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  bool _loggedIn = false;
-
-  @override
-  void initState() {
-    _checkLoginStatus();
-    super.initState();
-  }
-
-  _checkLoginStatus() {
-    GetStorage box = GetStorage();
-    _loggedIn = box.read('user') ?? false;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -33,7 +17,7 @@ class _HomeScreenState extends State<HomeScreen> {
       //navigation bar
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
-        title: AppBarWidget(loggedIn: _loggedIn),
+        title: const AppBarWidget(),
       ),
       body: SingleChildScrollView(
         //section 1

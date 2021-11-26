@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
 
-class AppBarWidget extends StatelessWidget {
-  final bool loggedIn;
-  AppBarWidget({Key? key, required this.loggedIn}) : super(key: key);
+class AppBarWidget extends StatefulWidget {
+  const AppBarWidget({Key? key}) : super(key: key);
 
+  @override
+  State<AppBarWidget> createState() => _AppBarWidgetState();
+}
+
+class _AppBarWidgetState extends State<AppBarWidget> {
   final List<String> _popupMenu = [
     'My Wallet',
     'My Bookings',
@@ -15,6 +20,19 @@ class AppBarWidget extends StatelessWidget {
   ];
 
   final GlobalKey _key = GlobalKey();
+
+  bool _loggedIn = false;
+
+  @override
+  void initState() {
+    _checkLoginStatus();
+    super.initState();
+  }
+
+  _checkLoginStatus() {
+    GetStorage box = GetStorage();
+    _loggedIn = box.read('user') ?? false;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -45,14 +63,14 @@ class AppBarWidget extends StatelessWidget {
         Row(
           children: [
             InkWell(
-              onTap: () {},
+              onTap: () => Get.offNamed(RouteConstant.home),
               child: const Text('HOME'),
             ),
             const SizedBox(
               width: 20,
             ),
             InkWell(
-              onTap: () {},
+              onTap: () => Get.offNamed(RouteConstant.bookOnline),
               child: const Text('BOOK ONLINE'),
             ),
             const SizedBox(
@@ -67,7 +85,7 @@ class AppBarWidget extends StatelessWidget {
         InkWell(
           key: _key,
           onTap: () {
-            if (!loggedIn) {
+            if (!_loggedIn) {
               Get.toNamed(RouteConstant.login);
             } else {
               _popUp();
