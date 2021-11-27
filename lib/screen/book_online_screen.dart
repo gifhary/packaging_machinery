@@ -13,10 +13,13 @@ class BookOnlineScreen extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
-          title: const AppBarWidget()),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
+            title: const AppBarWidget()),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [

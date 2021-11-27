@@ -105,6 +105,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
           child: Row(
             children: [
               const CircleAvatar(
+                radius: 15,
                 backgroundImage: AssetImage('assets/img/blank_profile.png'),
               ),
               const SizedBox(

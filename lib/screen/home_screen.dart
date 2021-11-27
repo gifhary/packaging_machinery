@@ -36,9 +36,12 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       //navigation bar
-      appBar: AppBar(
-        backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
-        title: AppBarWidget(onContactUs: _scrollToBottom),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(40),
+        child: AppBar(
+          backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
+          title: AppBarWidget(onContactUs: _scrollToBottom),
+        ),
       ),
       body: SingleChildScrollView(
         controller: _scrollController,
