@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:packaging_machinery/model/order_request.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 import 'package:packaging_machinery/widget/machine_input_group.dart';
 
@@ -10,20 +11,47 @@ class BookNowScreen extends StatefulWidget {
 }
 
 class _BookNowScreenState extends State<BookNowScreen> {
-  int _partCount = 1;
   bool _approveAfterConfirm = false;
 
-  _addPart() {
+  final OrderRequest _orderRequest = OrderRequest(
+    orderTitle: TextEditingController(),
+    machineList: [
+      MachineRequest(machineType: TextEditingController(), partRequest: [
+        PartRequest(
+            partNumber: TextEditingController(),
+            itemName: TextEditingController())
+      ]),
+    ],
+  );
+
+  _addMachine() {
     setState(() {
-      _partCount++;
+      _orderRequest.machineList.add(
+        MachineRequest(machineType: TextEditingController(), partRequest: [
+          PartRequest(
+              partNumber: TextEditingController(),
+              itemName: TextEditingController())
+        ]),
+      );
     });
   }
 
-  Widget _machineGroup() {
+  _addPart() {
+    setState(() {
+      _orderRequest
+          .machineList[_orderRequest.machineList.length - 1].partRequest
+          .add(PartRequest(
+              partNumber: TextEditingController(),
+              itemName: TextEditingController()));
+    });
+  }
+
+  Widget _machineGroup(MachineRequest machineRequest) {
     return Column(
-      children: const [
-        MachineInputGroup(),
-        Padding(
+      children: [
+        MachineInputGroup(
+            machineRequest: machineRequest, onAddMorePart: _addPart),
+        const Padding(
           padding: EdgeInsets.only(bottom: 20),
           child: Divider(color: Colors.white),
         ),
@@ -65,9 +93,10 @@ class _BookNowScreenState extends State<BookNowScreen> {
                         style: TextStyle(
                             fontSize: 24, fontWeight: FontWeight.bold),
                       ),
-                      const TextField(
+                      TextField(
+                        controller: _orderRequest.orderTitle,
                         maxLines: 5,
-                        decoration: InputDecoration(
+                        decoration: const InputDecoration(
                           focusedBorder: OutlineInputBorder(
                             borderSide: BorderSide(
                                 color: Color.fromRGBO(117, 111, 99, 1),
@@ -85,9 +114,10 @@ class _BookNowScreenState extends State<BookNowScreen> {
                         padding: EdgeInsets.symmetric(vertical: 20),
                         child: Divider(color: Colors.white),
                       ),
-                      for (int i = 0; i < _partCount; i++) _machineGroup(),
+                      for (int i = 0; i < _orderRequest.machineList.length; i++)
+                        _machineGroup(_orderRequest.machineList[i]),
                       InkWell(
-                        onTap: _addPart,
+                        onTap: _addMachine,
                         child: const Text(
                           'Add more machine+',
                           style: TextStyle(

@@ -1,35 +1,29 @@
 import 'package:flutter/material.dart';
+import 'package:packaging_machinery/model/order_request.dart';
 
-class MachineInputGroup extends StatefulWidget {
-  const MachineInputGroup({Key? key}) : super(key: key);
+class MachineInputGroup extends StatelessWidget {
+  final MachineRequest machineRequest;
+  final VoidCallback? onAddMorePart;
 
-  @override
-  State<MachineInputGroup> createState() => _MachineInputGroupState();
-}
+  const MachineInputGroup(
+      {Key? key, required this.machineRequest, this.onAddMorePart})
+      : super(key: key);
 
-class _MachineInputGroupState extends State<MachineInputGroup> {
-  int _partCount = 1;
-
-  _addPart() {
-    setState(() {
-      _partCount++;
-    });
-  }
-
-  Widget _machinePartWidget() {
+  Widget _machinePartWidget(PartRequest partRequest) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Padding(
+            children: [
+              const Padding(
                 padding: EdgeInsets.symmetric(vertical: 9),
                 child: Text('Parts Number:'),
               ),
               TextField(
-                decoration: InputDecoration(
+                controller: partRequest.partNumber,
+                decoration: const InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                         color: Color.fromRGBO(117, 111, 99, 1), width: 1),
@@ -48,13 +42,14 @@ class _MachineInputGroupState extends State<MachineInputGroup> {
         Flexible(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            children: const [
-              Padding(
+            children: [
+              const Padding(
                 padding: EdgeInsets.symmetric(vertical: 9),
                 child: Text('Item:'),
               ),
               TextField(
-                decoration: InputDecoration(
+                controller: partRequest.itemName,
+                decoration: const InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                         color: Color.fromRGBO(117, 111, 99, 1), width: 1),
@@ -80,11 +75,12 @@ class _MachineInputGroupState extends State<MachineInputGroup> {
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.center,
-          children: const [
-            Text('Machine Type: '),
+          children: [
+            const Text('Machine Type: '),
             Flexible(
               child: TextField(
-                decoration: InputDecoration(
+                controller: machineRequest.machineType,
+                decoration: const InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(
                         color: Color.fromRGBO(117, 111, 99, 1), width: 1),
@@ -100,11 +96,12 @@ class _MachineInputGroupState extends State<MachineInputGroup> {
           ],
         ),
         const SizedBox(height: 20),
-        for (int i = 0; i < _partCount; i++) _machinePartWidget(),
+        for (int i = 0; i < machineRequest.partRequest.length; i++)
+          _machinePartWidget(machineRequest.partRequest[i]),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: InkWell(
-            onTap: _addPart,
+            onTap: onAddMorePart,
             child: const Text(
               'Add more parts+',
               style: TextStyle(
