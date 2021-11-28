@@ -80,7 +80,8 @@ class BookOnlineScreen extends StatelessWidget {
                                   style: OutlinedButton.styleFrom(
                                       primary: const Color.fromRGBO(
                                           160, 152, 128, 1)),
-                                  onPressed: () {},
+                                  onPressed: () =>
+                                      Get.toNamed(RouteConstant.orderNow),
                                   child: const Text('ORDER NOW'),
                                 )
                               ],

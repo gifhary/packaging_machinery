@@ -3,14 +3,14 @@ import 'package:packaging_machinery/model/order_request.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 import 'package:packaging_machinery/widget/machine_input_group.dart';
 
-class BookNowScreen extends StatefulWidget {
-  const BookNowScreen({Key? key}) : super(key: key);
+class OrderNowScreen extends StatefulWidget {
+  const OrderNowScreen({Key? key}) : super(key: key);
 
   @override
-  State<BookNowScreen> createState() => _BookNowScreenState();
+  State<OrderNowScreen> createState() => _OrderNowScreenState();
 }
 
-class _BookNowScreenState extends State<BookNowScreen> {
+class _OrderNowScreenState extends State<OrderNowScreen> {
   bool _approveAfterConfirm = false;
 
   final OrderRequest _orderRequest = OrderRequest(
@@ -200,7 +200,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                               primary: const Color.fromRGBO(160, 152, 128, 1),
                             ),
                             onPressed: () {},
-                            child: const Text('Book Now'),
+                            child: const Text('Order Now'),
                           ),
                           const SizedBox(width: 30),
                           OutlinedButton(
