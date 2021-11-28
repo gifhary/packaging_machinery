@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/model/user.dart';
+import 'package:packaging_machinery/model/popup_item.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
 
 class AppBarWidget extends StatefulWidget {
@@ -13,12 +14,12 @@ class AppBarWidget extends StatefulWidget {
 }
 
 class _AppBarWidgetState extends State<AppBarWidget> {
-  final List<String> _popupMenu = [
-    'My Wallet',
-    'My Bookings',
-    'My Archive',
-    'My Account',
-    'Log Out'
+  final List<PopupItem> _popupMenu = [
+    PopupItem('My Wallet', () => Get.toNamed(RouteConstant.profile)),
+    PopupItem('My Bookings', () => Get.toNamed(RouteConstant.profile)),
+    PopupItem('My Archive', () => Get.toNamed(RouteConstant.profile)),
+    PopupItem('My Account', () => Get.toNamed(RouteConstant.profile)),
+    PopupItem('Log Out', () {}),
   ];
 
   final GlobalKey _key = GlobalKey();
@@ -55,17 +56,21 @@ class _AppBarWidgetState extends State<AppBarWidget> {
       Offset offset = _box.localToGlobal(Offset.zero);
 
       await showMenu(
-          context: context,
-          position: RelativeRect.fromLTRB(
-              offset.dx + _box.size.width,
-              offset.dy + _box.size.height + 10,
-              _width - 50 - (offset.dx + _box.size.width),
-              _height - (offset.dy + _box.size.height)),
-          items: _popupMenu
-              .map((e) => PopupMenuItem<String>(
-                    child: Text(e),
-                  ))
-              .toList());
+        context: context,
+        position: RelativeRect.fromLTRB(
+            offset.dx + _box.size.width,
+            offset.dy + _box.size.height + 10,
+            _width - 50 - (offset.dx + _box.size.width),
+            _height - (offset.dy + _box.size.height)),
+        items: _popupMenu
+            .map((e) => PopupMenuItem<int>(
+                  child: Text(e.name),
+                  value: _popupMenu.indexOf(e),
+                ))
+            .toList(),
+      ).then<void>((item) {
+        _popupMenu[item ?? 0].onTap();
+      });
     }
 
     return Row(
@@ -96,11 +101,12 @@ class _AppBarWidgetState extends State<AppBarWidget> {
         InkWell(
           key: _key,
           onTap: () {
-            if (_user == null) {
-              Get.toNamed(RouteConstant.login);
-            } else {
-              _popUp();
-            }
+            _popUp();
+            // if (_user == null) {
+            //   Get.toNamed(RouteConstant.login);
+            // } else {
+            //   _popUp();
+            // }
           },
           child: Row(
             children: [
