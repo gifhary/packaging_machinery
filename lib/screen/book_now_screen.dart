@@ -77,9 +77,22 @@ class _BookNowScreenState extends State<BookNowScreen> {
           children: [
             Row(
               children: [
-                Container(
+                SizedBox(
                   width: _width * 0.35,
-                  color: Colors.white,
+                  child: Column(
+                    children: const [
+                      Text(
+                        'Spare Parts Order',
+                        style: TextStyle(fontSize: 36),
+                      ),
+                      SizedBox(
+                          width: 250,
+                          child: Text(
+                            'You can check your order in your account >> My Bookings',
+                            textAlign: TextAlign.center,
+                          ))
+                    ],
+                  ),
                 ),
                 Container(
                   padding: const EdgeInsets.all(100),
