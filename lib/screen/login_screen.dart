@@ -21,7 +21,7 @@ class LoginScreen extends StatelessWidget {
             children: [
               const Text('New to this site? '),
               InkWell(
-                onTap: () => Get.toNamed(RouteConstant.register),
+                onTap: () => Get.offNamed(RouteConstant.register),
                 child: const Text(
                   'Sign Up',
                   style: TextStyle(color: Color.fromRGBO(117, 111, 99, 1)),

@@ -11,8 +11,6 @@ class BookNowScreen extends StatefulWidget {
 }
 
 class _BookNowScreenState extends State<BookNowScreen> {
-  bool _approveAfterConfirm = false;
-
   final OrderRequest _orderRequest = OrderRequest(
     orderTitle: TextEditingController(),
     machineList: [
@@ -131,64 +129,15 @@ class _BookNowScreenState extends State<BookNowScreen> {
                       ),
                       for (int i = 0; i < _orderRequest.machineList.length; i++)
                         _machineGroup(_orderRequest.machineList[i]),
-                      InkWell(
-                        onTap: _addMachine,
-                        child: const Text(
-                          'Add more machine+',
-                          style: TextStyle(
-                            decoration: TextDecoration.underline,
-                          ),
-                        ),
-                      ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 20),
-                        child: Row(
-                          children: [
-                            Checkbox(
-                                value: _approveAfterConfirm,
-                                onChanged: (bool? value) {
-                                  setState(() {
-                                    _approveAfterConfirm = value!;
-                                  });
-                                }),
-                            const Text(
-                              'Immediately approve after confirmation.',
-                              style: TextStyle(fontStyle: FontStyle.italic),
+                        padding: const EdgeInsets.symmetric(vertical: 18),
+                        child: InkWell(
+                          onTap: _addMachine,
+                          child: const Text(
+                            'Add more machine+',
+                            style: TextStyle(
+                              decoration: TextDecoration.underline,
                             ),
-                          ],
-                        ),
-                      ),
-                      Visibility(
-                        visible: _approveAfterConfirm,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20),
-                          child: Row(
-                            children: const [
-                              Text(
-                                'Approver*',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              SizedBox(width: 20),
-                              SizedBox(
-                                width: 300,
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Color.fromRGBO(117, 111, 99, 1),
-                                          width: 1),
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Color.fromRGBO(117, 111, 99, 1),
-                                          width: 1),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ),
