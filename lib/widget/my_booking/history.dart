@@ -7,7 +7,22 @@ class History extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: const Text('History'),
+      child: SingleChildScrollView(
+        child: Column(
+          children: const [
+            Text('History'),
+            SizedBox(height: 200),
+            Text('History'),
+            SizedBox(height: 200),
+            Text('History'),
+            SizedBox(height: 200),
+            Text('History'),
+            SizedBox(height: 200),
+            Text('History'),
+            SizedBox(height: 200),
+          ],
+        ),
+      ),
     );
   }
 }

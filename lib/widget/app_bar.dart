@@ -15,10 +15,12 @@ class AppBarWidget extends StatefulWidget {
 
 class _AppBarWidgetState extends State<AppBarWidget> {
   final List<PopupItem> _popupMenu = [
-    PopupItem('My Wallet', () => Get.offNamed(RouteConstant.profile)),
-    PopupItem('My Bookings', () => Get.offNamed(RouteConstant.profile)),
-    PopupItem('My Archive', () => Get.offNamed(RouteConstant.profile)),
-    PopupItem('My Account', () => Get.offNamed(RouteConstant.profile)),
+    PopupItem(
+        'My Order', () => Get.offNamed(RouteConstant.profile, arguments: 0)),
+    PopupItem(
+        'My Booking', () => Get.offNamed(RouteConstant.profile, arguments: 1)),
+    PopupItem(
+        'My Account', () => Get.offNamed(RouteConstant.profile, arguments: 2)),
     PopupItem('Log Out', () {}),
   ];
 

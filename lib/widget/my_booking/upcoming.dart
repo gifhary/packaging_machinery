@@ -7,7 +7,26 @@ class Upcoming extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       color: Colors.white,
-      child: const Text('Upcoming'),
+      child: SingleChildScrollView(
+        child: Column(
+          children: const [
+            SizedBox(height: 100),
+            Text('Upcoming'),
+            SizedBox(height: 100),
+            Text('Upcoming'),
+            Text('Upcoming'),
+            SizedBox(height: 100),
+            Text('Upcoming'),
+            Text('Upcoming'),
+            SizedBox(height: 100),
+            Text('Upcoming'),
+            Text('Upcoming'),
+            SizedBox(height: 100),
+            Text('Upcoming'),
+            SizedBox(height: 100),
+          ],
+        ),
+      ),
     );
   }
 }
