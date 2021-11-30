@@ -48,6 +48,43 @@ class ProfileScreen extends StatelessWidget {
                         Container(
                           color: const Color.fromRGBO(117, 111, 99, 1),
                           height: 150,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    Image.asset(
+                                      'assets/img/logo.png',
+                                      height: 100,
+                                      width: 204,
+                                      fit: BoxFit.cover,
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: const [
+                                        Text(
+                                          'User Name',
+                                          style: TextStyle(
+                                            fontSize: 30,
+                                            color: Colors.white,
+                                          ),
+                                        ),
+                                        Text(
+                                          'Customer/Admin',
+                                          style: TextStyle(color: Colors.white),
+                                        )
+                                      ],
+                                    )
+                                  ],
+                                ),
+                              )
+                            ],
+                          ),
                         ),
                         const ColoredBox(
                           color: Colors.white,
