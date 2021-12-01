@@ -1,11 +1,17 @@
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/constant/db_constant.dart';
 import 'package:packaging_machinery/model/order_data.dart';
 import 'package:packaging_machinery/model/order_request.dart';
+import 'package:packaging_machinery/model/user.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 import 'package:packaging_machinery/widget/machine_input_group.dart';
 import 'package:uuid/uuid.dart';
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
 
 class BookNowScreen extends StatefulWidget {
   const BookNowScreen({Key? key}) : super(key: key);
@@ -77,7 +83,6 @@ class _BookNowScreenState extends State<BookNowScreen> {
   }
 
   _migrateReqToData() {
-    //TODO this shit
     _orderData.orderTitle = _orderRequest.orderTitle.text;
 
     _orderRequest.machineList.forEach((key, value) {
@@ -85,11 +90,22 @@ class _BookNowScreenState extends State<BookNowScreen> {
           machineType: _orderRequest.machineList[key]!.machineType.text,
           partRequest: {});
     });
+
+    //mampus lu ga ngerti juga gw
+    for (String machineKey in _orderData.machineList.keys) {
+      _orderRequest.machineList[machineKey]!.partRequest.forEach((key, value) {
+        _orderData.machineList[machineKey]!.partRequest[key] = PartData(
+            partNumber: _orderRequest
+                .machineList[machineKey]!.partRequest[key]!.partNumber.text,
+            itemName: _orderRequest
+                .machineList[machineKey]!.partRequest[key]!.itemName.text);
+      });
+    }
   }
 
-  _getMachineList() {}
-
-  _getPartList() {}
+  String getMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -97,10 +113,19 @@ class _BookNowScreenState extends State<BookNowScreen> {
     double _width = MediaQuery.of(context).size.width;
 
     _bookNow() {
-      booking.push().set({
-        'orderTitle': _orderRequest.orderTitle.text,
-        'machineList': _orderRequest.machineList
-      });
+      GetStorage box = GetStorage();
+      var data = box.read('user');
+      User _user = User.fromJson(data);
+
+      _migrateReqToData();
+      booking
+          .child(getMd5(_user.email))
+          .push()
+          .set(_orderData.toMap())
+          .then((value) => Get.offNamed(
+                RouteConstant.profile,
+                arguments: 1,
+              ));
     }
 
     return Scaffold(
@@ -130,7 +155,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                       SizedBox(
                           width: 250,
                           child: Text(
-                            'You can check your order in your account >> My Bookings',
+                            'You can check your order in your account >> My Booking',
                             textAlign: TextAlign.center,
                           ))
                     ],
@@ -198,7 +223,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                             style: OutlinedButton.styleFrom(
                                 primary:
                                     const Color.fromRGBO(160, 152, 128, 1)),
-                            onPressed: () {},
+                            onPressed: Get.back,
                             child: const Text('Discard'),
                           )
                         ],

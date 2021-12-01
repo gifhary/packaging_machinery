@@ -6,7 +6,23 @@ class OrderData {
 
   Map<String, dynamic> toMap() => {
         "orderTitle": orderTitle,
-        "machineList": machineList,
+        "machineList": {
+          for (String machineKey in machineList.keys)
+            machineKey: {
+              'machineType': machineList[machineKey]!.machineType,
+              'partRequest': {
+                for (String partKey
+                    in machineList[machineKey]!.partRequest.keys)
+                  partKey: {
+                    'partNumber': machineList[machineKey]!
+                        .partRequest[partKey]!
+                        .partNumber,
+                    'itemName':
+                        machineList[machineKey]!.partRequest[partKey]!.itemName
+                  }
+              }
+            },
+        },
       };
 }
 

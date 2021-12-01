@@ -32,9 +32,8 @@ class _LoginScreenState extends State<LoginScreen> {
     _login() {
       users.child(getMd5(emailCtrl.text)).get().then((value) {
         if (value.exists && getMd5(passCtrl.text) == value.value['password']) {
-          debugPrint("yee " + value.value.toString());
           GetStorage box = GetStorage();
-          box.write('user', value.value);
+          box.write('user', User.fromMap(value.value).toJson());
           Get.offAllNamed(RouteConstant.home);
         } else {
           setState(() {
