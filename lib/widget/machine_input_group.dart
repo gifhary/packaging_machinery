@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:packaging_machinery/model/order_request.dart';
 
 class MachineInputGroup extends StatelessWidget {
+  final String mapKey;
   final MachineRequest machineRequest;
-  final VoidCallback? onAddMorePart;
+  final Function(String)? onAddMorePart;
 
   const MachineInputGroup(
-      {Key? key, required this.machineRequest, this.onAddMorePart})
+      {Key? key,
+      required this.machineRequest,
+      this.onAddMorePart,
+      required this.mapKey})
       : super(key: key);
 
   Widget _machinePartWidget(PartRequest partRequest) {
@@ -96,12 +100,12 @@ class MachineInputGroup extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 20),
-        for (int i = 0; i < machineRequest.partRequest.length; i++)
-          _machinePartWidget(machineRequest.partRequest[i]),
+        for (String key in machineRequest.partRequest.keys)
+          _machinePartWidget(machineRequest.partRequest[key]!),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: InkWell(
-            onTap: onAddMorePart,
+            onTap: () => onAddMorePart!(mapKey),
             child: const Text(
               'Add more parts+',
               style: TextStyle(

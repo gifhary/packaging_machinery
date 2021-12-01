@@ -49,8 +49,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
         'password': getMd5(passCtrl.text),
       }).then((_) {
         GetStorage box = GetStorage();
-        box.write('user',
-            User(email: emailCtrl.text, password: getMd5(passCtrl.text)));
+        box.write(
+            'user',
+            User(email: emailCtrl.text, password: getMd5(passCtrl.text))
+                .toJson());
         Get.offAllNamed(RouteConstant.home);
       });
     }

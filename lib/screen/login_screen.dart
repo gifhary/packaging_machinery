@@ -34,7 +34,7 @@ class _LoginScreenState extends State<LoginScreen> {
         if (value.exists && getMd5(passCtrl.text) == value.value['password']) {
           debugPrint("yee " + value.value.toString());
           GetStorage box = GetStorage();
-          box.write('user', User.fromMap(value.value));
+          box.write('user', value.value);
           Get.offAllNamed(RouteConstant.home);
         } else {
           setState(() {

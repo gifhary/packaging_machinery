@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:packaging_machinery/model/order_request.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 import 'package:packaging_machinery/widget/machine_input_group.dart';
+import 'package:uuid/uuid.dart';
 
 class OrderNowScreen extends StatefulWidget {
   const OrderNowScreen({Key? key}) : super(key: key);
@@ -11,44 +12,58 @@ class OrderNowScreen extends StatefulWidget {
 }
 
 class _OrderNowScreenState extends State<OrderNowScreen> {
-  final OrderRequest _orderRequest = OrderRequest(
-    orderTitle: TextEditingController(),
-    machineList: [
-      MachineRequest(machineType: TextEditingController(), partRequest: [
-        PartRequest(
-            partNumber: TextEditingController(),
-            itemName: TextEditingController())
-      ]),
-    ],
-  );
+  var uuid = const Uuid();
+
+  late OrderRequest _orderRequest;
+
+  @override
+  initState() {
+    _orderRequest = OrderRequest(
+      orderTitle: TextEditingController(),
+      machineList: {
+        uuid.v1():
+            MachineRequest(machineType: TextEditingController(), partRequest: {
+          uuid.v1(): PartRequest(
+              partNumber: TextEditingController(),
+              itemName: TextEditingController())
+        }),
+      },
+    );
+
+    super.initState();
+  }
 
   _addMachine() {
     setState(() {
-      _orderRequest.machineList.add(
-        MachineRequest(machineType: TextEditingController(), partRequest: [
-          PartRequest(
-              partNumber: TextEditingController(),
-              itemName: TextEditingController())
-        ]),
-      );
+      _orderRequest.machineList.putIfAbsent(
+          uuid.v1(),
+          () => MachineRequest(
+                  machineType: TextEditingController(),
+                  partRequest: {
+                    uuid.v1(): PartRequest(
+                        partNumber: TextEditingController(),
+                        itemName: TextEditingController())
+                  }));
     });
   }
 
-  _addPart() {
+  _addPart(String key) {
     setState(() {
-      _orderRequest
-          .machineList[_orderRequest.machineList.length - 1].partRequest
-          .add(PartRequest(
+      _orderRequest.machineList[key]!.partRequest.putIfAbsent(
+          uuid.v1(),
+          () => PartRequest(
               partNumber: TextEditingController(),
               itemName: TextEditingController()));
     });
   }
 
-  Widget _machineGroup(MachineRequest machineRequest) {
+  Widget _machineGroup(MachineRequest machineRequest, String key) {
     return Column(
       children: [
         MachineInputGroup(
-            machineRequest: machineRequest, onAddMorePart: _addPart),
+            mapKey: key,
+            machineRequest: machineRequest,
+            onAddMorePart: _addPart),
         const Padding(
           padding: EdgeInsets.only(bottom: 20),
           child: Divider(color: Colors.white),
@@ -127,8 +142,8 @@ class _OrderNowScreenState extends State<OrderNowScreen> {
                         padding: EdgeInsets.symmetric(vertical: 20),
                         child: Divider(color: Colors.white),
                       ),
-                      for (int i = 0; i < _orderRequest.machineList.length; i++)
-                        _machineGroup(_orderRequest.machineList[i]),
+                      for (String keys in _orderRequest.machineList.keys)
+                        _machineGroup(_orderRequest.machineList[keys]!, keys),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         child: InkWell(

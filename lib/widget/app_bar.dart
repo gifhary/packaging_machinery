@@ -40,7 +40,9 @@ class _AppBarWidgetState extends State<AppBarWidget> {
 
   _checkLoginStatus() {
     GetStorage box = GetStorage();
-    _user = box.read('user');
+    var data = box.read('user');
+    if (data == null) return;
+    _user = User.fromJson(data);
   }
 
   _contactUs() {
@@ -122,7 +124,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
               const SizedBox(
                 width: 20,
               ),
-              Text(_user == null ? 'Log In' : _user!.email.toString()),
+              Text(_user == null ? 'Log In' : _user!.email),
             ],
           ),
         ),

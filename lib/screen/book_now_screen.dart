@@ -1,7 +1,11 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:packaging_machinery/constant/db_constant.dart';
+import 'package:packaging_machinery/model/order_data.dart';
 import 'package:packaging_machinery/model/order_request.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 import 'package:packaging_machinery/widget/machine_input_group.dart';
+import 'package:uuid/uuid.dart';
 
 class BookNowScreen extends StatefulWidget {
   const BookNowScreen({Key? key}) : super(key: key);
@@ -11,44 +15,59 @@ class BookNowScreen extends StatefulWidget {
 }
 
 class _BookNowScreenState extends State<BookNowScreen> {
-  final OrderRequest _orderRequest = OrderRequest(
-    orderTitle: TextEditingController(),
-    machineList: [
-      MachineRequest(machineType: TextEditingController(), partRequest: [
-        PartRequest(
-            partNumber: TextEditingController(),
-            itemName: TextEditingController())
-      ]),
-    ],
-  );
+  final db = FirebaseDatabase.instance.reference();
+  var uuid = const Uuid();
+
+  late OrderRequest _orderRequest;
+  final OrderData _orderData = OrderData(machineList: {}, orderTitle: '');
+
+  @override
+  initState() {
+    _orderRequest = OrderRequest(
+      orderTitle: TextEditingController(),
+      machineList: {
+        uuid.v1():
+            MachineRequest(machineType: TextEditingController(), partRequest: {
+          uuid.v1(): PartRequest(
+              partNumber: TextEditingController(),
+              itemName: TextEditingController())
+        }),
+      },
+    );
+    super.initState();
+  }
 
   _addMachine() {
     setState(() {
-      _orderRequest.machineList.add(
-        MachineRequest(machineType: TextEditingController(), partRequest: [
-          PartRequest(
-              partNumber: TextEditingController(),
-              itemName: TextEditingController())
-        ]),
-      );
+      _orderRequest.machineList.putIfAbsent(
+          uuid.v1(),
+          () => MachineRequest(
+                  machineType: TextEditingController(),
+                  partRequest: {
+                    uuid.v1(): PartRequest(
+                        partNumber: TextEditingController(),
+                        itemName: TextEditingController())
+                  }));
     });
   }
 
-  _addPart() {
+  _addPart(String key) {
     setState(() {
-      _orderRequest
-          .machineList[_orderRequest.machineList.length - 1].partRequest
-          .add(PartRequest(
+      _orderRequest.machineList[key]!.partRequest.putIfAbsent(
+          uuid.v1(),
+          () => PartRequest(
               partNumber: TextEditingController(),
               itemName: TextEditingController()));
     });
   }
 
-  Widget _machineGroup(MachineRequest machineRequest) {
+  Widget _machineGroup(MachineRequest machineRequest, String key) {
     return Column(
       children: [
         MachineInputGroup(
-            machineRequest: machineRequest, onAddMorePart: _addPart),
+            mapKey: key,
+            machineRequest: machineRequest,
+            onAddMorePart: _addPart),
         const Padding(
           padding: EdgeInsets.only(bottom: 20),
           child: Divider(color: Colors.white),
@@ -57,9 +76,32 @@ class _BookNowScreenState extends State<BookNowScreen> {
     );
   }
 
+  _migrateReqToData() {
+    //TODO this shit
+    _orderData.orderTitle = _orderRequest.orderTitle.text;
+
+    _orderRequest.machineList.forEach((key, value) {
+      _orderData.machineList[key] = MachineData(
+          machineType: _orderRequest.machineList[key]!.machineType.text,
+          partRequest: {});
+    });
+  }
+
+  _getMachineList() {}
+
+  _getPartList() {}
+
   @override
   Widget build(BuildContext context) {
+    final booking = db.child(DbConstant.booking);
     double _width = MediaQuery.of(context).size.width;
+
+    _bookNow() {
+      booking.push().set({
+        'orderTitle': _orderRequest.orderTitle.text,
+        'machineList': _orderRequest.machineList
+      });
+    }
 
     return Scaffold(
       appBar: PreferredSize(
@@ -127,8 +169,8 @@ class _BookNowScreenState extends State<BookNowScreen> {
                         padding: EdgeInsets.symmetric(vertical: 20),
                         child: Divider(color: Colors.white),
                       ),
-                      for (int i = 0; i < _orderRequest.machineList.length; i++)
-                        _machineGroup(_orderRequest.machineList[i]),
+                      for (String keys in _orderRequest.machineList.keys)
+                        _machineGroup(_orderRequest.machineList[keys]!, keys),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 18),
                         child: InkWell(
@@ -148,7 +190,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
                             style: ElevatedButton.styleFrom(
                               primary: const Color.fromRGBO(160, 152, 128, 1),
                             ),
-                            onPressed: () {},
+                            onPressed: _bookNow,
                             child: const Text('Book Now'),
                           ),
                           const SizedBox(width: 30),
