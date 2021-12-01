@@ -21,7 +21,11 @@ class _AppBarWidgetState extends State<AppBarWidget> {
         'My Booking', () => Get.offNamed(RouteConstant.profile, arguments: 1)),
     PopupItem(
         'My Account', () => Get.offNamed(RouteConstant.profile, arguments: 2)),
-    PopupItem('Log Out', () {}),
+    PopupItem('Log Out', () {
+      GetStorage box = GetStorage();
+      box.erase();
+      Get.offAllNamed(RouteConstant.home);
+    }),
   ];
 
   final GlobalKey _key = GlobalKey();
@@ -60,7 +64,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
       await showMenu(
         context: context,
         position: RelativeRect.fromLTRB(
-            offset.dx + _box.size.width,
+            offset.dx,
             offset.dy + _box.size.height + 10,
             _width - 50 - (offset.dx + _box.size.width),
             _height - (offset.dy + _box.size.height)),
@@ -118,7 +122,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
               const SizedBox(
                 width: 20,
               ),
-              Text(_user == null ? 'Log In' : _user!.email),
+              Text(_user == null ? 'Log In' : _user!.email.toString()),
             ],
           ),
         ),
