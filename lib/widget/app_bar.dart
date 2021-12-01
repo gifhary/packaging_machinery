@@ -71,7 +71,7 @@ class _AppBarWidgetState extends State<AppBarWidget> {
                 ))
             .toList(),
       ).then<void>((item) {
-        _popupMenu[item ?? 0].onTap();
+        _popupMenu[item!].onTap();
       });
     }
 
@@ -103,12 +103,11 @@ class _AppBarWidgetState extends State<AppBarWidget> {
         InkWell(
           key: _key,
           onTap: () {
-            _popUp();
-            // if (_user == null) {
-            //   Get.toNamed(RouteConstant.login);
-            // } else {
-            //   _popUp();
-            // }
+            if (_user == null) {
+              Get.toNamed(RouteConstant.login);
+            } else {
+              _popUp();
+            }
           },
           child: Row(
             children: [
