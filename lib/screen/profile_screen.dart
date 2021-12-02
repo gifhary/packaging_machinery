@@ -63,10 +63,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _getOrderList() {
-    booking.child(getMd5(_user.email)).get().then((value) {
+    order.child(getMd5(_user.email)).get().then((value) {
       value.value.forEach((key, val) => _orderItem
           .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
       setState(() {});
+    });
+  }
+
+  _submitBookingToOrder(String bookingId, OrderData data) {
+    order
+        .child('${getMd5(_user.email)}/$bookingId')
+        .set(data.toMap())
+        .then((value) {
+      _deleteBooking(bookingId);
+    });
+  }
+
+  _deleteBooking(String bookingId) {
+    booking.child('${getMd5(_user.email)}/$bookingId').remove().then((value) {
+      setState(() {
+        _orderItem.add(_bookingItem
+            .where((element) => element.orderId == bookingId)
+            .first);
+        _bookingItem.removeWhere((element) => element.orderId == bookingId);
+      });
     });
   }
 
@@ -168,7 +188,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
                         MyOrderTab(item: _orderItem),
-                        MyBookingTab(item: _bookingItem),
+                        MyBookingTab(
+                          item: _bookingItem,
+                          onSubmit: _submitBookingToOrder,
+                          onDelete: _deleteBooking,
+                          onTap: (s) {},
+                        ),
                         const MyAccountTab(),
                       ],
                     ),

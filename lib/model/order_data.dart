@@ -2,30 +2,38 @@ import 'dart:convert';
 
 class OrderData {
   String orderTitle;
+  String? time;
   Map<String, MachineData> machineList;
 
-  OrderData({required this.orderTitle, required this.machineList});
+  OrderData({
+    required this.orderTitle,
+    this.time,
+    required this.machineList,
+  });
 
-  factory OrderData.fromMap(Map<String, dynamic> json) =>
-      OrderData(orderTitle: json['orderTitle'], machineList: {
-        for (String machineKey in json['machineList'].keys)
-          machineKey: MachineData(
-            machineType: json['machineList'][machineKey]['machineType'],
-            partRequest: {
-              for (String key
-                  in json['machineList'][machineKey]['partRequest'].keys)
-                key: PartData(
-                  partNumber: json['machineList'][machineKey]['partRequest']
-                      [key]['partNumber'],
-                  itemName: json['machineList'][machineKey]['partRequest'][key]
-                      ['itemName'],
-                )
-            },
-          )
-      });
+  factory OrderData.fromMap(Map<String, dynamic> json) => OrderData(
+          orderTitle: json['orderTitle'],
+          time: json['time'],
+          machineList: {
+            for (String machineKey in json['machineList'].keys)
+              machineKey: MachineData(
+                machineType: json['machineList'][machineKey]['machineType'],
+                partRequest: {
+                  for (String key
+                      in json['machineList'][machineKey]['partRequest'].keys)
+                    key: PartData(
+                      partNumber: json['machineList'][machineKey]['partRequest']
+                          [key]['partNumber'],
+                      itemName: json['machineList'][machineKey]['partRequest']
+                          [key]['itemName'],
+                    )
+                },
+              )
+          });
 
   Map<String, dynamic> toMap() => {
         "orderTitle": orderTitle,
+        "time": DateTime.now().toString(),
         "machineList": {
           for (String machineKey in machineList.keys)
             machineKey: {

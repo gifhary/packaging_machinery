@@ -40,6 +40,10 @@ class _LoginScreenState extends State<LoginScreen> {
             loginError = 'invalid credentials';
           });
         }
+      }).onError((error, stackTrace) {
+        setState(() {
+          loginError = error.toString();
+        });
       });
     }
 

@@ -25,7 +25,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
   var uuid = const Uuid();
 
   late OrderRequest _orderRequest;
-  OrderData _orderData = OrderData(machineList: {}, orderTitle: '');
+  late OrderData _orderData;
 
   @override
   initState() {
