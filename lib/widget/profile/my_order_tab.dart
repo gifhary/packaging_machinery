@@ -1,10 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:packaging_machinery/widget/my_booking/history.dart';
-import 'package:packaging_machinery/widget/my_booking/upcoming.dart';
+import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/widget/my_order/history.dart';
+import 'package:packaging_machinery/widget/my_order/upcoming.dart';
 
 class MyOrderTab extends StatelessWidget {
-  const MyOrderTab({Key? key}) : super(key: key);
+  final List<Item> item;
+  const MyOrderTab({Key? key, required this.item}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

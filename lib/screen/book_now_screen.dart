@@ -25,7 +25,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
   var uuid = const Uuid();
 
   late OrderRequest _orderRequest;
-  final OrderData _orderData = OrderData(machineList: {}, orderTitle: '');
+  OrderData _orderData = OrderData(machineList: {}, orderTitle: '');
 
   @override
   initState() {
@@ -83,24 +83,27 @@ class _BookNowScreenState extends State<BookNowScreen> {
   }
 
   _migrateReqToData() {
-    _orderData.orderTitle = _orderRequest.orderTitle.text;
-
-    _orderRequest.machineList.forEach((key, value) {
-      _orderData.machineList[key] = MachineData(
-          machineType: _orderRequest.machineList[key]!.machineType.text,
-          partRequest: {});
-    });
-
-    //mampus lu ga ngerti juga gw
-    for (String machineKey in _orderData.machineList.keys) {
-      _orderRequest.machineList[machineKey]!.partRequest.forEach((key, value) {
-        _orderData.machineList[machineKey]!.partRequest[key] = PartData(
-            partNumber: _orderRequest
-                .machineList[machineKey]!.partRequest[key]!.partNumber.text,
-            itemName: _orderRequest
-                .machineList[machineKey]!.partRequest[key]!.itemName.text);
-      });
-    }
+    //mampus ga ngerti
+    _orderData = OrderData(
+      orderTitle: _orderRequest.orderTitle.text,
+      machineList: {
+        for (String machineKey in _orderRequest.machineList.keys)
+          machineKey: MachineData(
+            machineType:
+                _orderRequest.machineList[machineKey]!.machineType.text,
+            partRequest: {
+              for (String partKey
+                  in _orderRequest.machineList[machineKey]!.partRequest.keys)
+                partKey: PartData(
+                  itemName: _orderRequest.machineList[machineKey]!
+                      .partRequest[partKey]!.itemName.text,
+                  partNumber: _orderRequest.machineList[machineKey]!
+                      .partRequest[partKey]!.partNumber.text,
+                ),
+            },
+          ),
+      },
+    );
   }
 
   String getMd5(String input) {

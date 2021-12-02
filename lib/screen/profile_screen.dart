@@ -1,5 +1,14 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:packaging_machinery/constant/db_constant.dart';
+import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/order_data.dart';
+import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
 import 'package:packaging_machinery/widget/profile/my_account_tab.dart';
 import 'package:packaging_machinery/widget/profile/my_booking_tab.dart';
@@ -7,8 +16,59 @@ import 'package:packaging_machinery/widget/profile/my_order_tab.dart';
 
 enum ProfilePage { wallet, booking, archive, account }
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({Key? key}) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final db = FirebaseDatabase.instance.reference();
+  late DatabaseReference booking;
+  late DatabaseReference order;
+
+  GetStorage box = GetStorage();
+  late String _data;
+  late User _user;
+
+  List<Item> _bookingItem = [];
+  List<Item> _orderItem = [];
+
+  String getMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
+  }
+
+  @override
+  void initState() {
+    _data = box.read('user');
+    _user = User.fromJson(_data);
+
+    booking = db.child(DbConstant.booking);
+    order = db.child(DbConstant.order);
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
+      _getBookingList();
+      _getOrderList();
+    });
+    super.initState();
+  }
+
+  _getBookingList() {
+    booking.child(getMd5(_user.email)).get().then((value) {
+      value.value.forEach((key, val) => _bookingItem
+          .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
+      setState(() {});
+    });
+  }
+
+  _getOrderList() {
+    booking.child(getMd5(_user.email)).get().then((value) {
+      value.value.forEach((key, val) => _orderItem
+          .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
+      setState(() {});
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,13 +163,13 @@ class ProfileScreen extends StatelessWidget {
                     width: double.infinity,
                     color: const Color.fromRGBO(117, 111, 99, 0.5),
                   ),
-                  const Flexible(
+                  Flexible(
                     child: TabBarView(
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        MyOrderTab(),
-                        MyBookingTab(),
-                        MyAccountTab(),
+                        MyOrderTab(item: _orderItem),
+                        MyBookingTab(item: _bookingItem),
+                        const MyAccountTab(),
                       ],
                     ),
                   )
