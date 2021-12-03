@@ -1,5 +1,12 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:packaging_machinery/constant/db_constant.dart';
+import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/widget/ini_text_field.dart';
 
 class MyAccountTab extends StatefulWidget {
@@ -10,47 +17,135 @@ class MyAccountTab extends StatefulWidget {
 }
 
 class _MyAccountTabState extends State<MyAccountTab> {
-  TextEditingController _nameCtr = TextEditingController();
-  TextEditingController _titleCtr = TextEditingController();
+  final db = FirebaseDatabase.instance.reference();
+  late DatabaseReference usersDb;
+  late User _user;
 
-  TextEditingController _firstNameCtr = TextEditingController();
-  TextEditingController _lastNameCtr = TextEditingController();
-  TextEditingController _phoneCtr = TextEditingController();
-  TextEditingController _additionalEmailCtr = TextEditingController();
-  TextEditingController _companyCtr = TextEditingController();
-  TextEditingController _positionCtr = TextEditingController();
+  final TextEditingController _nameCtr = TextEditingController();
+  final TextEditingController _titleCtr = TextEditingController();
 
-  TextEditingController _address1Ctr = TextEditingController();
-  TextEditingController _address2Ctr = TextEditingController();
-  TextEditingController _streetCtr = TextEditingController();
-  TextEditingController _cityCtr = TextEditingController();
-  TextEditingController _zipCodeCtr = TextEditingController();
-  TextEditingController _countryCtr = TextEditingController();
+  final TextEditingController _firstNameCtr = TextEditingController();
+  final TextEditingController _lastNameCtr = TextEditingController();
+  final TextEditingController _phoneCtr = TextEditingController();
+  final TextEditingController _additionalEmailCtr = TextEditingController();
+  final TextEditingController _companyCtr = TextEditingController();
+  final TextEditingController _positionCtr = TextEditingController();
 
-  TextEditingController _deliveryAddress1Ctr = TextEditingController();
-  TextEditingController _deliveryAddress2Ctr = TextEditingController();
-  TextEditingController _deliveryStreetCtr = TextEditingController();
-  TextEditingController _deliveryCityCtr = TextEditingController();
-  TextEditingController _deliveryZipCodeCtr = TextEditingController();
-  TextEditingController _deliveryCountryCtr = TextEditingController();
+  final TextEditingController _address1Ctr = TextEditingController();
+  final TextEditingController _address2Ctr = TextEditingController();
+  final TextEditingController _streetCtr = TextEditingController();
+  final TextEditingController _cityCtr = TextEditingController();
+  final TextEditingController _zipCodeCtr = TextEditingController();
+  final TextEditingController _countryCtr = TextEditingController();
 
-  TextEditingController _billAddress1Ctr = TextEditingController();
-  TextEditingController _billAddress2Ctr = TextEditingController();
-  TextEditingController _billStreetCtr = TextEditingController();
-  TextEditingController _billCityCtr = TextEditingController();
-  TextEditingController _billZipCodeCtr = TextEditingController();
-  TextEditingController _billCountryCtr = TextEditingController();
+  final TextEditingController _deliveryAddress1Ctr = TextEditingController();
+  final TextEditingController _deliveryAddress2Ctr = TextEditingController();
+  final TextEditingController _deliveryStreetCtr = TextEditingController();
+  final TextEditingController _deliveryCityCtr = TextEditingController();
+  final TextEditingController _deliveryZipCodeCtr = TextEditingController();
+  final TextEditingController _deliveryCountryCtr = TextEditingController();
 
-  TextEditingController _settlementAddress1Ctr = TextEditingController();
-  TextEditingController _settlementAddress2Ctr = TextEditingController();
-  TextEditingController _settlementStreetCtr = TextEditingController();
-  TextEditingController _settlementCityCtr = TextEditingController();
-  TextEditingController _settlementZipCodeCtr = TextEditingController();
-  TextEditingController _settlementCountryCtr = TextEditingController();
+  final TextEditingController _billAddress1Ctr = TextEditingController();
+  final TextEditingController _billAddress2Ctr = TextEditingController();
+  final TextEditingController _billStreetCtr = TextEditingController();
+  final TextEditingController _billCityCtr = TextEditingController();
+  final TextEditingController _billZipCodeCtr = TextEditingController();
+  final TextEditingController _billCountryCtr = TextEditingController();
+
+  final TextEditingController _settlementAddress1Ctr = TextEditingController();
+  final TextEditingController _settlementAddress2Ctr = TextEditingController();
+  final TextEditingController _settlementStreetCtr = TextEditingController();
+  final TextEditingController _settlementCityCtr = TextEditingController();
+  final TextEditingController _settlementZipCodeCtr = TextEditingController();
+  final TextEditingController _settlementCountryCtr = TextEditingController();
 
   @override
   initState() {
+    usersDb = db.child(DbConstant.user);
+
+    _checkLoginStatus();
+
+    if (_user.userDetail == null) {
+      _getFormDataFromDB();
+    } else {
+      _fillFormWithExistingData();
+    }
     super.initState();
+  }
+
+  _getFormDataFromDB() {
+    usersDb.child(getMd5(_user.email)).get().then((value) {
+      _user = User.fromMap(value.value);
+      if (_user.userDetail != null) {
+        //fill data
+        _fillFormWithExistingData();
+      } else {
+        debugPrint('user detail doesnt exists');
+      }
+    }).onError((error, stackTrace) {
+      debugPrint('error getting form data');
+    });
+  }
+
+  String getMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
+  }
+
+  _checkLoginStatus() {
+    GetStorage box = GetStorage();
+    var data = box.read('user');
+    if (data == null) return;
+    _user = User.fromJson(data);
+  }
+
+  _postUserDetail() {}
+
+  _fillFormWithExistingData() {
+    setState(() {
+      _nameCtr.text = _user.userDetail!.name;
+      _titleCtr.text = _user.userDetail!.title!;
+
+      _firstNameCtr.text = _user.userDetail!.firstName!;
+      _lastNameCtr.text = _user.userDetail!.lastName!;
+      _phoneCtr.text = _user.userDetail!.phone!;
+      _additionalEmailCtr.text = _user.userDetail!.additionalEmail!;
+      _companyCtr.text = _user.userDetail!.company!;
+      _positionCtr.text = _user.userDetail!.position!;
+
+      _address1Ctr.text = _user.userDetail!.address.address1;
+      _address2Ctr.text = _user.userDetail!.address.address2!;
+      _streetCtr.text = _user.userDetail!.address.street!;
+      _cityCtr.text = _user.userDetail!.address.city;
+      _zipCodeCtr.text = _user.userDetail!.address.zipcode;
+      _countryCtr.text = _user.userDetail!.address.country;
+
+      _deliveryAddress1Ctr.text = _user.userDetail!.deliveryAddress.address1;
+      _deliveryAddress2Ctr.text = _user.userDetail!.deliveryAddress.address2!;
+      _deliveryStreetCtr.text = _user.userDetail!.deliveryAddress.street!;
+      _deliveryCityCtr.text = _user.userDetail!.deliveryAddress.city;
+      _deliveryZipCodeCtr.text = _user.userDetail!.deliveryAddress.city;
+      _deliveryCountryCtr.text = _user.userDetail!.deliveryAddress.country;
+
+      _billAddress1Ctr.text = _user.userDetail!.invoiceBillAddress!.address1;
+      _billAddress2Ctr.text = _user.userDetail!.invoiceBillAddress!.address2!;
+      _billStreetCtr.text = _user.userDetail!.invoiceBillAddress!.street!;
+      _billCityCtr.text = _user.userDetail!.invoiceBillAddress!.city;
+      _billZipCodeCtr.text = _user.userDetail!.invoiceBillAddress!.zipcode;
+      _billCountryCtr.text = _user.userDetail!.invoiceBillAddress!.city;
+
+      _settlementAddress1Ctr.text =
+          _user.userDetail!.invoiceBillingSettlementAddress!.address1;
+      _settlementAddress2Ctr.text =
+          _user.userDetail!.invoiceBillingSettlementAddress!.address2!;
+      _settlementStreetCtr.text =
+          _user.userDetail!.invoiceBillingSettlementAddress!.street!;
+      _settlementCityCtr.text =
+          _user.userDetail!.invoiceBillingSettlementAddress!.city;
+      _settlementZipCodeCtr.text =
+          _user.userDetail!.invoiceBillingSettlementAddress!.zipcode;
+      _settlementCountryCtr.text =
+          _user.userDetail!.invoiceBillingSettlementAddress!.country;
+    });
   }
 
   @override
@@ -106,12 +201,14 @@ class _MyAccountTabState extends State<MyAccountTab> {
               Padding(
                 padding: const EdgeInsets.symmetric(vertical: 15),
                 child: Row(
-                  children: const [
+                  children: [
                     IniTextField(
+                      controller: _nameCtr,
                       label: 'Buyer Name*',
                     ),
-                    SizedBox(width: 50),
+                    const SizedBox(width: 50),
                     IniTextField(
+                      controller: _titleCtr,
                       label: 'Title',
                     ),
                   ],
@@ -136,36 +233,42 @@ class _MyAccountTabState extends State<MyAccountTab> {
               ),
               const SizedBox(height: 20),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _firstNameCtr,
                     label: 'First Name',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _lastNameCtr,
                     label: 'Last Name',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _phoneCtr,
                     label: 'Phone',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _additionalEmailCtr,
                     label: 'Email',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _companyCtr,
                     label: 'Company',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _positionCtr,
                     label: 'Position',
                   ),
                 ],
@@ -179,36 +282,42 @@ class _MyAccountTabState extends State<MyAccountTab> {
                 ),
               ),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _address1Ctr,
                     label: 'Address 1*',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _cityCtr,
                     label: 'City*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _address2Ctr,
                     label: 'Address 2',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _zipCodeCtr,
                     label: 'Zipcode*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _streetCtr,
                     label: 'Street',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _countryCtr,
                     label: 'Country*',
                   ),
                 ],
@@ -222,36 +331,42 @@ class _MyAccountTabState extends State<MyAccountTab> {
                 ),
               ),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _deliveryAddress1Ctr,
                     label: 'Address 1*',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _deliveryCityCtr,
                     label: 'City*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _deliveryAddress2Ctr,
                     label: 'Address 2',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _deliveryZipCodeCtr,
                     label: 'Zipcode*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _deliveryStreetCtr,
                     label: 'Street',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _deliveryCountryCtr,
                     label: 'Country*',
                   ),
                 ],
@@ -265,36 +380,42 @@ class _MyAccountTabState extends State<MyAccountTab> {
                 ),
               ),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _billAddress1Ctr,
                     label: 'Address 1*',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _billCityCtr,
                     label: 'City*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _billAddress2Ctr,
                     label: 'Address 2',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _billZipCodeCtr,
                     label: 'Zipcode*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _billStreetCtr,
                     label: 'Street',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _billCountryCtr,
                     label: 'Country*',
                   ),
                 ],
@@ -308,36 +429,42 @@ class _MyAccountTabState extends State<MyAccountTab> {
                 ),
               ),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _settlementAddress1Ctr,
                     label: 'Address 1*',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _settlementCityCtr,
                     label: 'City*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _settlementAddress2Ctr,
                     label: 'Address 2',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _settlementZipCodeCtr,
                     label: 'Zipcode*',
                   ),
                 ],
               ),
               const SizedBox(height: 5),
               Row(
-                children: const [
+                children: [
                   IniTextField(
+                    controller: _settlementStreetCtr,
                     label: 'Street',
                   ),
-                  SizedBox(width: 50),
+                  const SizedBox(width: 50),
                   IniTextField(
+                    controller: _settlementCountryCtr,
                     label: 'Country*',
                   ),
                 ],

@@ -1,11 +1,12 @@
 import 'dart:convert';
 
 class Address {
-  String address1, address2, street, city, zipcode, country;
+  String address1, city, zipcode, country;
+  String? address2, street;
   Address({
     required this.address1,
-    required this.address2,
-    required this.street,
+    this.address2,
+    this.street,
     required this.city,
     required this.zipcode,
     required this.country,

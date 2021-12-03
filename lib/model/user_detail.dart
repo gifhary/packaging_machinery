@@ -3,23 +3,23 @@ import 'dart:convert';
 import 'package:packaging_machinery/model/address.dart';
 
 class UserDetail {
-  String name, title, firstName, lastName, additionalEmail, company, position;
-  Address address,
-      deliveryAddress,
-      invoiceBillAddress,
-      invoiceBillingSettlementAddress;
+  String name;
+  String? title, firstName, lastName, phone, additionalEmail, company, position;
+  Address address, deliveryAddress;
+  Address? invoiceBillAddress, invoiceBillingSettlementAddress;
   UserDetail({
     required this.name,
-    required this.title,
-    required this.firstName,
-    required this.lastName,
-    required this.additionalEmail,
-    required this.company,
-    required this.position,
+    this.title,
+    this.firstName,
+    this.lastName,
+    this.phone,
+    this.additionalEmail,
+    this.company,
+    this.position,
     required this.address,
     required this.deliveryAddress,
-    required this.invoiceBillAddress,
-    required this.invoiceBillingSettlementAddress,
+    this.invoiceBillAddress,
+    this.invoiceBillingSettlementAddress,
   });
 
   UserDetail copyWith({
@@ -27,6 +27,7 @@ class UserDetail {
     String? title,
     String? firstName,
     String? lastName,
+    String? phone,
     String? additionalEmail,
     String? company,
     String? position,
@@ -40,6 +41,7 @@ class UserDetail {
       title: title ?? this.title,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
+      phone: phone ?? this.phone,
       additionalEmail: additionalEmail ?? this.additionalEmail,
       company: company ?? this.company,
       position: position ?? this.position,
@@ -57,14 +59,15 @@ class UserDetail {
       'title': title,
       'firstName': firstName,
       'lastName': lastName,
+      'phone': phone,
       'additionalEmail': additionalEmail,
       'company': company,
       'position': position,
       'address': address.toMap(),
       'deliveryAddress': deliveryAddress.toMap(),
-      'invoiceBillAddress': invoiceBillAddress.toMap(),
+      'invoiceBillAddress': invoiceBillAddress?.toMap(),
       'invoiceBillingSettlementAddress':
-          invoiceBillingSettlementAddress.toMap(),
+          invoiceBillingSettlementAddress?.toMap(),
     };
   }
 
@@ -74,14 +77,19 @@ class UserDetail {
       title: map['title'],
       firstName: map['firstName'],
       lastName: map['lastName'],
+      phone: map['phone'],
       additionalEmail: map['additionalEmail'],
       company: map['company'],
       position: map['position'],
       address: Address.fromMap(map['address']),
       deliveryAddress: Address.fromMap(map['deliveryAddress']),
-      invoiceBillAddress: Address.fromMap(map['invoiceBillAddress']),
+      invoiceBillAddress: map['invoiceBillAddress'] != null
+          ? Address.fromMap(map['invoiceBillAddress'])
+          : null,
       invoiceBillingSettlementAddress:
-          Address.fromMap(map['invoiceBillingSettlementAddress']),
+          map['invoiceBillingSettlementAddress'] != null
+              ? Address.fromMap(map['invoiceBillingSettlementAddress'])
+              : null,
     );
   }
 
@@ -92,7 +100,7 @@ class UserDetail {
 
   @override
   String toString() {
-    return 'UserDetail(name: $name, title: $title, firstName: $firstName, lastName: $lastName, additionalEmail: $additionalEmail, company: $company, position: $position, address: $address, deliveryAddress: $deliveryAddress, invoiceBillAddress: $invoiceBillAddress, invoiceBillingSettlementAddress: $invoiceBillingSettlementAddress)';
+    return 'UserDetail(name: $name, title: $title, firstName: $firstName, lastName: $lastName, phone: $phone additionalEmail: $additionalEmail, company: $company, position: $position, address: $address, deliveryAddress: $deliveryAddress, invoiceBillAddress: $invoiceBillAddress, invoiceBillingSettlementAddress: $invoiceBillingSettlementAddress)';
   }
 
   @override
@@ -104,6 +112,7 @@ class UserDetail {
         other.title == title &&
         other.firstName == firstName &&
         other.lastName == lastName &&
+        other.phone == phone &&
         other.additionalEmail == additionalEmail &&
         other.company == company &&
         other.position == position &&
@@ -120,6 +129,7 @@ class UserDetail {
         title.hashCode ^
         firstName.hashCode ^
         lastName.hashCode ^
+        phone.hashCode ^
         additionalEmail.hashCode ^
         company.hashCode ^
         position.hashCode ^
