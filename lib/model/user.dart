@@ -1,38 +1,65 @@
-// To parse this JSON data, do
-//
-//     final user = userFromMap(jsonString);
-
 import 'dart:convert';
 
+import 'package:packaging_machinery/model/user_detail.dart';
+
 class User {
+  String email;
+  String password;
+  UserDetail? userDetail;
   User({
     required this.email,
     required this.password,
+    this.userDetail,
   });
 
-  String email;
-  String password;
-
   User copyWith({
-    required String email,
-    required String password,
-  }) =>
-      User(
-        email: email,
-        password: password,
-      );
+    String? email,
+    String? password,
+    UserDetail? userDetail,
+  }) {
+    return User(
+      email: email ?? this.email,
+      password: password ?? this.password,
+      userDetail: userDetail ?? this.userDetail,
+    );
+  }
 
-  factory User.fromJson(String str) => User.fromMap(json.decode(str));
+  Map<String, dynamic> toMap() {
+    return {
+      'email': email,
+      'password': password,
+      'userDetail': userDetail?.toMap(),
+    };
+  }
+
+  factory User.fromMap(Map<String, dynamic> map) {
+    return User(
+      email: map['email'],
+      password: map['password'],
+      userDetail: map['userDetail'] != null
+          ? UserDetail.fromMap(map['userDetail'])
+          : null,
+    );
+  }
 
   String toJson() => json.encode(toMap());
 
-  factory User.fromMap(Map<String, dynamic> json) => User(
-        email: json["email"],
-        password: json["password"],
-      );
+  factory User.fromJson(String source) => User.fromMap(json.decode(source));
 
-  Map<String, dynamic> toMap() => {
-        "email": email,
-        "password": password,
-      };
+  @override
+  String toString() =>
+      'User(email: $email, password: $password, userDetail: $userDetail)';
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is User &&
+        other.email == email &&
+        other.password == password &&
+        other.userDetail == userDetail;
+  }
+
+  @override
+  int get hashCode => email.hashCode ^ password.hashCode ^ userDetail.hashCode;
 }

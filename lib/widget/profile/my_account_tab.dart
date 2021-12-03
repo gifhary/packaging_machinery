@@ -2,8 +2,56 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:packaging_machinery/widget/ini_text_field.dart';
 
-class MyAccountTab extends StatelessWidget {
+class MyAccountTab extends StatefulWidget {
   const MyAccountTab({Key? key}) : super(key: key);
+
+  @override
+  State<MyAccountTab> createState() => _MyAccountTabState();
+}
+
+class _MyAccountTabState extends State<MyAccountTab> {
+  TextEditingController _nameCtr = TextEditingController();
+  TextEditingController _titleCtr = TextEditingController();
+
+  TextEditingController _firstNameCtr = TextEditingController();
+  TextEditingController _lastNameCtr = TextEditingController();
+  TextEditingController _phoneCtr = TextEditingController();
+  TextEditingController _additionalEmailCtr = TextEditingController();
+  TextEditingController _companyCtr = TextEditingController();
+  TextEditingController _positionCtr = TextEditingController();
+
+  TextEditingController _address1Ctr = TextEditingController();
+  TextEditingController _address2Ctr = TextEditingController();
+  TextEditingController _streetCtr = TextEditingController();
+  TextEditingController _cityCtr = TextEditingController();
+  TextEditingController _zipCodeCtr = TextEditingController();
+  TextEditingController _countryCtr = TextEditingController();
+
+  TextEditingController _deliveryAddress1Ctr = TextEditingController();
+  TextEditingController _deliveryAddress2Ctr = TextEditingController();
+  TextEditingController _deliveryStreetCtr = TextEditingController();
+  TextEditingController _deliveryCityCtr = TextEditingController();
+  TextEditingController _deliveryZipCodeCtr = TextEditingController();
+  TextEditingController _deliveryCountryCtr = TextEditingController();
+
+  TextEditingController _billAddress1Ctr = TextEditingController();
+  TextEditingController _billAddress2Ctr = TextEditingController();
+  TextEditingController _billStreetCtr = TextEditingController();
+  TextEditingController _billCityCtr = TextEditingController();
+  TextEditingController _billZipCodeCtr = TextEditingController();
+  TextEditingController _billCountryCtr = TextEditingController();
+
+  TextEditingController _settlementAddress1Ctr = TextEditingController();
+  TextEditingController _settlementAddress2Ctr = TextEditingController();
+  TextEditingController _settlementStreetCtr = TextEditingController();
+  TextEditingController _settlementCityCtr = TextEditingController();
+  TextEditingController _settlementZipCodeCtr = TextEditingController();
+  TextEditingController _settlementCountryCtr = TextEditingController();
+
+  @override
+  initState() {
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -145,7 +193,7 @@ class MyAccountTab extends StatelessWidget {
               Row(
                 children: const [
                   IniTextField(
-                    label: 'Address 3',
+                    label: 'Address 2',
                   ),
                   SizedBox(width: 50),
                   IniTextField(
@@ -188,7 +236,7 @@ class MyAccountTab extends StatelessWidget {
               Row(
                 children: const [
                   IniTextField(
-                    label: 'Address 3',
+                    label: 'Address 2',
                   ),
                   SizedBox(width: 50),
                   IniTextField(
@@ -231,7 +279,7 @@ class MyAccountTab extends StatelessWidget {
               Row(
                 children: const [
                   IniTextField(
-                    label: 'Address 3',
+                    label: 'Address 2',
                   ),
                   SizedBox(width: 50),
                   IniTextField(
@@ -274,7 +322,7 @@ class MyAccountTab extends StatelessWidget {
               Row(
                 children: const [
                   IniTextField(
-                    label: 'Address 3',
+                    label: 'Address 2',
                   ),
                   SizedBox(width: 50),
                   IniTextField(

@@ -54,6 +54,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
             User(email: emailCtrl.text, password: getMd5(passCtrl.text))
                 .toJson());
         Get.offAllNamed(RouteConstant.home);
+      }).onError((error, stackTrace) {
+        setState(() {
+          emailError = error.toString();
+        });
       });
     }
 
