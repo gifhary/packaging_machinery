@@ -4,9 +4,13 @@ import 'package:crypto/crypto.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/constant/db_constant.dart';
+import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/user.dart';
+import 'package:packaging_machinery/model/user_detail.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/widget/ini_text_field.dart';
 
 class MyAccountTab extends StatefulWidget {
@@ -98,47 +102,130 @@ class _MyAccountTabState extends State<MyAccountTab> {
     _user = User.fromJson(data);
   }
 
-  _postUserDetail() {}
+  _writeToLocal() {
+    GetStorage box = GetStorage();
+    box.write('user', _user.toJson());
+  }
+
+  _fillAndPost() {
+    _fillUpUserModelWithInput();
+    _postUserDetail();
+  }
+
+  _postUserDetail() {
+    usersDb.child(getMd5(_user.email)).update({
+      'userDetail': _user.userDetail!.toMap(),
+    }).then((_) {
+      debugPrint('userDetail updated');
+      _writeToLocal();
+
+      //show dialog
+      Get.defaultDialog(
+          titleStyle: const TextStyle(color: Color.fromRGBO(117, 111, 99, 1)),
+          title: "Success",
+          middleText: "Your data has been updated!",
+          onConfirm: Get.back,
+          buttonColor: const Color.fromRGBO(117, 111, 99, 1),
+          confirmTextColor: Colors.white,
+          textConfirm: 'OK');
+    }).onError((error, stackTrace) {
+      debugPrint('error updating userDetail');
+    });
+  }
+
+  _fillUpUserModelWithInput() {
+    _user.userDetail = UserDetail(
+        name: _nameCtr.text,
+        title: _titleCtr.text.isEmpty ? null : _titleCtr.text,
+        firstName: _firstNameCtr.text.isEmpty ? null : _firstNameCtr.text,
+        lastName: _lastNameCtr.text.isEmpty ? null : _lastNameCtr.text,
+        phone: _phoneCtr.text.isEmpty ? null : _phoneCtr.text,
+        additionalEmail:
+            _additionalEmailCtr.text.isEmpty ? null : _additionalEmailCtr.text,
+        company: _companyCtr.text.isEmpty ? null : _companyCtr.text,
+        position: _positionCtr.text.isEmpty ? null : _positionCtr.text,
+        address: Address(
+            address1: _address1Ctr.text,
+            address2: _address2Ctr.text.isEmpty ? null : _address2Ctr.text,
+            city: _cityCtr.text,
+            street: _streetCtr.text.isEmpty ? null : _streetCtr.text,
+            zipcode: _zipCodeCtr.text,
+            country: _countryCtr.text),
+        deliveryAddress: Address(
+          address1: _deliveryAddress1Ctr.text,
+          address2: _deliveryAddress2Ctr.text.isEmpty
+              ? null
+              : _deliveryAddress2Ctr.text,
+          city: _deliveryCityCtr.text,
+          street:
+              _deliveryStreetCtr.text.isEmpty ? null : _deliveryStreetCtr.text,
+          zipcode: _deliveryZipCodeCtr.text,
+          country: _deliveryCountryCtr.text,
+        ),
+        invoiceBillAddress: Address(
+          address1: _billAddress1Ctr.text,
+          address2:
+              _billAddress2Ctr.text.isEmpty ? null : _billAddress2Ctr.text,
+          city: _billCityCtr.text,
+          street: _billStreetCtr.text.isEmpty ? null : _billStreetCtr.text,
+          zipcode: _billZipCodeCtr.text,
+          country: _billCountryCtr.text,
+        ),
+        invoiceBillingSettlementAddress: Address(
+          address1: _settlementAddress1Ctr.text,
+          address2: _settlementAddress2Ctr.text.isEmpty
+              ? null
+              : _settlementAddress2Ctr.text,
+          city: _settlementCityCtr.text,
+          street: _settlementStreetCtr.text.isEmpty
+              ? null
+              : _settlementStreetCtr.text,
+          zipcode: _settlementZipCodeCtr.text,
+          country: _settlementCountryCtr.text,
+        ));
+  }
 
   _fillFormWithExistingData() {
     setState(() {
       _nameCtr.text = _user.userDetail!.name;
-      _titleCtr.text = _user.userDetail!.title!;
+      _titleCtr.text = _user.userDetail!.title ?? '';
 
-      _firstNameCtr.text = _user.userDetail!.firstName!;
-      _lastNameCtr.text = _user.userDetail!.lastName!;
-      _phoneCtr.text = _user.userDetail!.phone!;
-      _additionalEmailCtr.text = _user.userDetail!.additionalEmail!;
-      _companyCtr.text = _user.userDetail!.company!;
-      _positionCtr.text = _user.userDetail!.position!;
+      _firstNameCtr.text = _user.userDetail!.firstName ?? '';
+      _lastNameCtr.text = _user.userDetail!.lastName ?? '';
+      _phoneCtr.text = _user.userDetail!.phone ?? '';
+      _additionalEmailCtr.text = _user.userDetail!.additionalEmail ?? '';
+      _companyCtr.text = _user.userDetail!.company ?? '';
+      _positionCtr.text = _user.userDetail!.position ?? '';
 
       _address1Ctr.text = _user.userDetail!.address.address1;
-      _address2Ctr.text = _user.userDetail!.address.address2!;
-      _streetCtr.text = _user.userDetail!.address.street!;
+      _address2Ctr.text = _user.userDetail!.address.address2 ?? '';
+      _streetCtr.text = _user.userDetail!.address.street ?? '';
       _cityCtr.text = _user.userDetail!.address.city;
       _zipCodeCtr.text = _user.userDetail!.address.zipcode;
       _countryCtr.text = _user.userDetail!.address.country;
 
       _deliveryAddress1Ctr.text = _user.userDetail!.deliveryAddress.address1;
-      _deliveryAddress2Ctr.text = _user.userDetail!.deliveryAddress.address2!;
-      _deliveryStreetCtr.text = _user.userDetail!.deliveryAddress.street!;
+      _deliveryAddress2Ctr.text =
+          _user.userDetail!.deliveryAddress.address2 ?? '';
+      _deliveryStreetCtr.text = _user.userDetail!.deliveryAddress.street ?? '';
       _deliveryCityCtr.text = _user.userDetail!.deliveryAddress.city;
-      _deliveryZipCodeCtr.text = _user.userDetail!.deliveryAddress.city;
+      _deliveryZipCodeCtr.text = _user.userDetail!.deliveryAddress.zipcode;
       _deliveryCountryCtr.text = _user.userDetail!.deliveryAddress.country;
 
       _billAddress1Ctr.text = _user.userDetail!.invoiceBillAddress!.address1;
-      _billAddress2Ctr.text = _user.userDetail!.invoiceBillAddress!.address2!;
-      _billStreetCtr.text = _user.userDetail!.invoiceBillAddress!.street!;
+      _billAddress2Ctr.text =
+          _user.userDetail!.invoiceBillAddress!.address2 ?? '';
+      _billStreetCtr.text = _user.userDetail!.invoiceBillAddress!.street ?? '';
       _billCityCtr.text = _user.userDetail!.invoiceBillAddress!.city;
       _billZipCodeCtr.text = _user.userDetail!.invoiceBillAddress!.zipcode;
-      _billCountryCtr.text = _user.userDetail!.invoiceBillAddress!.city;
+      _billCountryCtr.text = _user.userDetail!.invoiceBillAddress!.country;
 
       _settlementAddress1Ctr.text =
           _user.userDetail!.invoiceBillingSettlementAddress!.address1;
       _settlementAddress2Ctr.text =
-          _user.userDetail!.invoiceBillingSettlementAddress!.address2!;
+          _user.userDetail!.invoiceBillingSettlementAddress!.address2 ?? '';
       _settlementStreetCtr.text =
-          _user.userDetail!.invoiceBillingSettlementAddress!.street!;
+          _user.userDetail!.invoiceBillingSettlementAddress!.street ?? '';
       _settlementCityCtr.text =
           _user.userDetail!.invoiceBillingSettlementAddress!.city;
       _settlementZipCodeCtr.text =
@@ -173,7 +260,7 @@ class _MyAccountTabState extends State<MyAccountTab> {
                       OutlinedButton(
                         style: OutlinedButton.styleFrom(
                             primary: const Color.fromRGBO(160, 152, 128, 1)),
-                        onPressed: () {},
+                        onPressed: () => Get.offAllNamed(RouteConstant.home),
                         child: const Text('Discard'),
                       ),
                       const SizedBox(width: 20),
@@ -181,7 +268,7 @@ class _MyAccountTabState extends State<MyAccountTab> {
                         style: ElevatedButton.styleFrom(
                           primary: const Color.fromRGBO(160, 152, 128, 1),
                         ),
-                        onPressed: () {},
+                        onPressed: _fillAndPost,
                         child: const Text('Update info'),
                       ),
                     ],
@@ -476,7 +563,7 @@ class _MyAccountTabState extends State<MyAccountTab> {
                   OutlinedButton(
                     style: OutlinedButton.styleFrom(
                         primary: const Color.fromRGBO(160, 152, 128, 1)),
-                    onPressed: () {},
+                    onPressed: () => Get.offAllNamed(RouteConstant.home),
                     child: const Text('Discard'),
                   ),
                   const SizedBox(width: 20),
@@ -484,7 +571,7 @@ class _MyAccountTabState extends State<MyAccountTab> {
                     style: ElevatedButton.styleFrom(
                       primary: const Color.fromRGBO(160, 152, 128, 1),
                     ),
-                    onPressed: () {},
+                    onPressed: _fillAndPost,
                     child: const Text('Update info'),
                   ),
                 ],
