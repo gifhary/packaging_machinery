@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/order_data.dart';
-import 'package:packaging_machinery/widget/order_item.dart';
+import 'package:packaging_machinery/widget/booking_item.dart';
 
 class MyBookingTab extends StatelessWidget {
   final List<Item> item;
@@ -47,7 +47,7 @@ class MyBookingTab extends StatelessWidget {
               child: ListView.builder(
                   itemCount: item.length,
                   itemBuilder: (context, index) {
-                    return OrderItem(
+                    return BookingItem(
                       item: item[index],
                       onDelete: onDelete,
                       onSubmit: onSubmit,

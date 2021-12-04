@@ -85,6 +85,9 @@ class _BookNowScreenState extends State<BookNowScreen> {
   _migrateReqToData() {
     //mampus ga ngerti
     _orderData = OrderData(
+      approvedByCompany: false,
+      approvedByCustomer: false,
+      time: DateTime.now().toString(),
       orderTitle: _orderRequest.orderTitle.text,
       machineList: {
         for (String machineKey in _orderRequest.machineList.keys)

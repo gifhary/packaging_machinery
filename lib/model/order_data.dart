@@ -2,16 +2,22 @@ import 'dart:convert';
 
 class OrderData {
   String orderTitle;
-  String? time;
+  bool approvedByCompany;
+  bool approvedByCustomer;
+  String time;
   Map<String, MachineData> machineList;
 
   OrderData({
     required this.orderTitle,
-    this.time,
+    required this.approvedByCompany,
+    required this.approvedByCustomer,
+    required this.time,
     required this.machineList,
   });
 
   factory OrderData.fromMap(Map<String, dynamic> json) => OrderData(
+          approvedByCompany: json['approvedByCompany'],
+          approvedByCustomer: json['approvedByCustomer'],
           orderTitle: json['orderTitle'],
           time: json['time'],
           machineList: {
@@ -33,7 +39,9 @@ class OrderData {
 
   Map<String, dynamic> toMap() => {
         "orderTitle": orderTitle,
-        "time": DateTime.now().toString(),
+        'approvedByCompany': approvedByCompany,
+        'approvedByCustomer': approvedByCustomer,
+        "time": time,
         "machineList": {
           for (String machineKey in machineList.keys)
             machineKey: {

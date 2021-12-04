@@ -56,17 +56,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   _getBookingList() {
     booking.child(getMd5(_user.email)).get().then((value) {
-      value.value.forEach((key, val) => _bookingItem
-          .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
-      setState(() {});
+      if (value.exists) {
+        value.value.forEach((key, val) => _bookingItem
+            .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
+        setState(() {});
+      }
     });
   }
 
   _getOrderList() {
     order.child(getMd5(_user.email)).get().then((value) {
-      value.value.forEach((key, val) => _orderItem
-          .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
-      setState(() {});
+      if (value.exists) {
+        value.value.forEach((key, val) => _orderItem
+            .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
+        setState(() {});
+      }
     });
   }
 

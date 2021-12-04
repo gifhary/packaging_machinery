@@ -6,4 +6,5 @@ class RouteConstant {
   static const bookNow = '/bookNow';
   static const orderNow = '/orderNow';
   static const profile = '/profile';
+  static const quotationOrder = '$profile/quotationOrder';
 }

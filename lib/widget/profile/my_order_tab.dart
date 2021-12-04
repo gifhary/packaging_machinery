@@ -1,17 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:packaging_machinery/model/item.dart';
-import 'package:packaging_machinery/model/order_data.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/widget/order_item.dart';
 
 class MyOrderTab extends StatelessWidget {
   final List<Item> item;
-  final Function(String)? onTap;
-  final Function(String, OrderData)? onSubmit;
-  final Function(String)? onDelete;
-  const MyOrderTab(
-      {Key? key, required this.item, this.onTap, this.onSubmit, this.onDelete})
-      : super(key: key);
+  const MyOrderTab({Key? key, required this.item}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +39,9 @@ class MyOrderTab extends StatelessWidget {
                   itemCount: item.length,
                   itemBuilder: (context, index) {
                     return OrderItem(
-                      displayButton: false,
+                      onTap: (item) => Get.toNamed(RouteConstant.quotationOrder,
+                          arguments: item.toMap()),
                       item: item[index],
-                      onDelete: onDelete,
-                      onSubmit: onSubmit,
-                      onTap: onTap,
                     );
                   }),
             ),
