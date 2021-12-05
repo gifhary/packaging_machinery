@@ -17,6 +17,10 @@ class MachineRequest {
 class PartRequest {
   final TextEditingController partNumber;
   final TextEditingController itemName;
+  final TextEditingController quantity;
 
-  PartRequest({required this.partNumber, required this.itemName});
+  PartRequest(
+      {required this.quantity,
+      required this.partNumber,
+      required this.itemName});
 }

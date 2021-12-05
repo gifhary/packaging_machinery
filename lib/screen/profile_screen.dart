@@ -75,9 +75,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   _submitBookingToOrder(String bookingId, OrderData data) {
+    OrderData resetOrderTime = data;
+    resetOrderTime.orderTime = DateTime.now().toString();
+
     order
         .child('${getMd5(_user.email)}/$bookingId')
-        .set(data.toMap())
+        .set(resetOrderTime.toMap())
         .then((value) {
       _deleteBooking(bookingId);
     });

@@ -68,6 +68,32 @@ class MachineInputGroup extends StatelessWidget {
             ],
           ),
         ),
+        Container(
+          margin: const EdgeInsets.only(left: 20),
+          width: 70,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Padding(
+                padding: EdgeInsets.symmetric(vertical: 9),
+                child: Text('Quantity:'),
+              ),
+              TextField(
+                controller: partRequest.quantity,
+                decoration: const InputDecoration(
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color.fromRGBO(117, 111, 99, 1), width: 1),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                        color: Color.fromRGBO(117, 111, 99, 1), width: 1),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
       ],
     );
   }

@@ -35,8 +35,10 @@ class _BookNowScreenState extends State<BookNowScreen> {
         uuid.v1():
             MachineRequest(machineType: TextEditingController(), partRequest: {
           uuid.v1(): PartRequest(
-              partNumber: TextEditingController(),
-              itemName: TextEditingController())
+            partNumber: TextEditingController(),
+            itemName: TextEditingController(),
+            quantity: TextEditingController(),
+          )
         }),
       },
     );
@@ -51,8 +53,10 @@ class _BookNowScreenState extends State<BookNowScreen> {
                   machineType: TextEditingController(),
                   partRequest: {
                     uuid.v1(): PartRequest(
-                        partNumber: TextEditingController(),
-                        itemName: TextEditingController())
+                      partNumber: TextEditingController(),
+                      itemName: TextEditingController(),
+                      quantity: TextEditingController(),
+                    )
                   }));
     });
   }
@@ -62,8 +66,10 @@ class _BookNowScreenState extends State<BookNowScreen> {
       _orderRequest.machineList[key]!.partRequest.putIfAbsent(
           uuid.v1(),
           () => PartRequest(
-              partNumber: TextEditingController(),
-              itemName: TextEditingController()));
+                partNumber: TextEditingController(),
+                itemName: TextEditingController(),
+                quantity: TextEditingController(),
+              ));
     });
   }
 
@@ -87,7 +93,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
     _orderData = OrderData(
       approvedByCompany: false,
       approvedByCustomer: false,
-      time: DateTime.now().toString(),
+      orderTime: DateTime.now().toString(),
       orderTitle: _orderRequest.orderTitle.text,
       machineList: {
         for (String machineKey in _orderRequest.machineList.keys)
@@ -102,6 +108,8 @@ class _BookNowScreenState extends State<BookNowScreen> {
                       .partRequest[partKey]!.itemName.text,
                   partNumber: _orderRequest.machineList[machineKey]!
                       .partRequest[partKey]!.partNumber.text,
+                  quantity: int.parse(_orderRequest.machineList[machineKey]!
+                      .partRequest[partKey]!.quantity.text),
                 ),
             },
           ),

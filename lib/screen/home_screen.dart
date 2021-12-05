@@ -39,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(40),
         child: AppBar(
+          automaticallyImplyLeading: false,
           backgroundColor: const Color.fromRGBO(46, 45, 42, 1),
           title: AppBarWidget(onContactUs: _scrollToBottom),
         ),

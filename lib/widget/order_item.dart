@@ -27,6 +27,15 @@ class OrderItem extends StatelessWidget {
       return status;
     }
 
+    int daysBetween() {
+      DateTime from = DateTime.parse(item.orderData.deliveryNoteConfirmedDate!);
+      DateTime to = DateTime.now();
+
+      from = DateTime(from.year, from.month, from.day);
+      to = DateTime(to.year, to.month, to.day);
+      return (to.difference(from).inHours / 24).round();
+    }
+
     return Column(
       children: [
         InkWell(
@@ -55,13 +64,22 @@ class OrderItem extends StatelessWidget {
                             ),
                             Text('Order ID: ${item.orderId}'),
                             Text('Status: ${_getStatus()}'),
+                            item.orderData.deliveryNoteConfirmedDate == null
+                                ? Container()
+                                : Text(
+                                    'Due payment in ${45 - daysBetween()} days',
+                                    style: TextStyle(
+                                        color: 45 - daysBetween() < 3
+                                            ? Colors.red
+                                            : Colors.black),
+                                  ),
                           ],
                         ),
                       ),
                     ],
                   ),
                 ),
-                Text('Date created: ${item.orderData.time}'),
+                Text('Date created: ${item.orderData.orderTime}'),
               ],
             ),
           ),

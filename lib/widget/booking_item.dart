@@ -68,7 +68,7 @@ class BookingItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text('Date created: ${item.orderData.time}'),
+                Text('Date created: ${item.orderData.orderTime}'),
               ],
             ),
           ),

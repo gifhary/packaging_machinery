@@ -4,14 +4,16 @@ class OrderData {
   String orderTitle;
   bool approvedByCompany;
   bool approvedByCustomer;
-  String time;
+  String orderTime;
+  String? deliveryNoteConfirmedDate;
   Map<String, MachineData> machineList;
 
   OrderData({
+    this.deliveryNoteConfirmedDate,
     required this.orderTitle,
     required this.approvedByCompany,
     required this.approvedByCustomer,
-    required this.time,
+    required this.orderTime,
     required this.machineList,
   });
 
@@ -19,7 +21,8 @@ class OrderData {
           approvedByCompany: json['approvedByCompany'],
           approvedByCustomer: json['approvedByCustomer'],
           orderTitle: json['orderTitle'],
-          time: json['time'],
+          orderTime: json['orderTime'],
+          deliveryNoteConfirmedDate: json['deliveryNoteConfirmedDate'],
           machineList: {
             for (String machineKey in json['machineList'].keys)
               machineKey: MachineData(
@@ -32,6 +35,8 @@ class OrderData {
                           [key]['partNumber'],
                       itemName: json['machineList'][machineKey]['partRequest']
                           [key]['itemName'],
+                      quantity: json['machineList'][machineKey]['partRequest']
+                          [key]['quantity'],
                     )
                 },
               )
@@ -41,7 +46,8 @@ class OrderData {
         "orderTitle": orderTitle,
         'approvedByCompany': approvedByCompany,
         'approvedByCustomer': approvedByCustomer,
-        "time": time,
+        "orderTime": orderTime,
+        'deliveryNoteConfirmedDate': deliveryNoteConfirmedDate,
         "machineList": {
           for (String machineKey in machineList.keys)
             machineKey: {
@@ -54,7 +60,9 @@ class OrderData {
                         .partRequest[partKey]!
                         .partNumber,
                     'itemName':
-                        machineList[machineKey]!.partRequest[partKey]!.itemName
+                        machineList[machineKey]!.partRequest[partKey]!.itemName,
+                    'quantity':
+                        machineList[machineKey]!.partRequest[partKey]!.quantity
                   }
               }
             },
@@ -74,6 +82,11 @@ class MachineData {
 class PartData {
   String partNumber;
   String itemName;
+  int quantity;
 
-  PartData({required this.partNumber, required this.itemName});
+  PartData({
+    required this.partNumber,
+    required this.itemName,
+    required this.quantity,
+  });
 }
