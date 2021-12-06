@@ -92,6 +92,7 @@ class _OrderNowScreenState extends State<OrderNowScreen> {
   _migrateReqToData() {
     //mampus ga ngerti
     _orderData = OrderData(
+      confirmedBySales: false,
       approvedByCompany: false,
       approvedByCustomer: false,
       orderTime: DateTime.now().toString(),

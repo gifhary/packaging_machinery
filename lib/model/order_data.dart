@@ -4,11 +4,13 @@ class OrderData {
   String orderTitle;
   bool approvedByCompany;
   bool approvedByCustomer;
+  bool confirmedBySales;
   String orderTime;
   String? deliveryNoteConfirmedDate;
   Map<String, MachineData> machineList;
 
   OrderData({
+    required this.confirmedBySales,
     this.deliveryNoteConfirmedDate,
     required this.orderTitle,
     required this.approvedByCompany,
@@ -21,6 +23,7 @@ class OrderData {
           approvedByCompany: json['approvedByCompany'],
           approvedByCustomer: json['approvedByCustomer'],
           orderTitle: json['orderTitle'],
+          confirmedBySales: json['confirmedBySales'],
           orderTime: json['orderTime'],
           deliveryNoteConfirmedDate: json['deliveryNoteConfirmedDate'],
           machineList: {
@@ -47,6 +50,7 @@ class OrderData {
         'approvedByCompany': approvedByCompany,
         'approvedByCustomer': approvedByCustomer,
         "orderTime": orderTime,
+        'confirmedBySales': confirmedBySales,
         'deliveryNoteConfirmedDate': deliveryNoteConfirmedDate,
         "machineList": {
           for (String machineKey in machineList.keys)

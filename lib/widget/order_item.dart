@@ -17,9 +17,9 @@ class OrderItem extends StatelessWidget {
       if (item.orderData.approvedByCompany &&
           item.orderData.approvedByCustomer) {
         status = 'On delivery';
-      } else if (item.orderData.approvedByCompany &&
-          !item.orderData.approvedByCustomer) {
-        status = 'Waiting for confirmation';
+      } else if (!item.orderData.approvedByCompany &&
+          item.orderData.approvedByCustomer) {
+        status = 'Waiting for approval';
       } else if (!item.orderData.approvedByCompany &&
           !item.orderData.approvedByCustomer) {
         status = 'On process';
