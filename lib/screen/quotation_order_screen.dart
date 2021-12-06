@@ -1,4 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:packaging_machinery/model/address.dart';
+import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/order_data.dart';
+import 'package:packaging_machinery/model/user.dart';
 
 class QuotationOrderScreen extends StatefulWidget {
   const QuotationOrderScreen({Key? key}) : super(key: key);
@@ -8,15 +14,54 @@ class QuotationOrderScreen extends StatefulWidget {
 }
 
 class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
-  //final Item _item = Item.fromMap(Get.arguments);
+  final Item _item = Item.fromMap(Get.arguments);
   final bool i = false;
   final TextEditingController approverController = TextEditingController();
+  late User _user;
+
+  @override
+  void initState() {
+    _getLocalUserData();
+    super.initState();
+  }
+
+  _getLocalUserData() {
+    GetStorage box = GetStorage();
+    var data = box.read('user');
+    if (data == null) return;
+    _user = User.fromJson(data);
+  }
+
+  String _getAddress(Address address) {
+    String str = '';
+    debugPrint(address.toString());
+
+    if (address.address1.isNotEmpty) {
+      str += address.address1 + ', ';
+    }
+    if (address.address2?.isNotEmpty ?? false) {
+      str += address.address2! + ', ';
+    }
+    if (address.street?.isNotEmpty ?? false) {
+      str += address.street! + ', ';
+    }
+    if (address.city.isNotEmpty) {
+      str += address.city + ', ';
+    }
+    if (address.zipcode.isNotEmpty) {
+      str += address.zipcode + ', ';
+    }
+    if (address.country.isNotEmpty) {
+      str += address.country + '.';
+    }
+    return str;
+  }
 
   @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
 
-    Widget _getOrderItem() {
+    Widget _getOrderItem(MachineData machineData) {
       return SizedBox(
         width: double.infinity,
         child: Column(
@@ -29,7 +74,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                 children: [
                   //TODO here
                   Text(
-                    'Machine Type: LUBRICATION L7/SBY',
+                    'Machine Type: ${machineData.machineType}',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
                       color: const Color.fromRGBO(117, 111, 99, 1),
@@ -83,16 +128,18 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                 ),
               ),
             ], rows: [
-              DataRow(
-                cells: <DataCell>[
-                  DataCell(Text('Curved roller')),
-                  DataCell(Text('98u987')),
-                  DataCell(Text('2')),
-                  DataCell(Text('0.00')),
-                  DataCell(Text('')),
-                  DataCell(Text('')),
-                ],
-              ),
+              for (String key in machineData.partRequest.keys)
+                DataRow(
+                  cells: <DataCell>[
+                    DataCell(Text(machineData.partRequest[key]!.itemName)),
+                    DataCell(Text(machineData.partRequest[key]!.partNumber)),
+                    DataCell(Text(
+                        machineData.partRequest[key]!.quantity.toString())),
+                    DataCell(Text('0.00')),
+                    DataCell(Text('')),
+                    DataCell(Text('')),
+                  ],
+                ),
             ]),
           ],
         ),
@@ -138,7 +185,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Order id ',
+                          'Order: ${_item.orderId} ',
                           style: TextStyle(fontSize: 30),
                         ),
                         !i
@@ -183,7 +230,8 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                           SizedBox(
                             width: 300,
                             child: Text(
-                              'PT Coca-Cola Bottling Indonesia South Quarter Tower C Lantai 22(PH), Jalan RA Kartini Kav 8, RT.010 RW.004, Cilandak Barat, Cilandak, Jakarta Selatan, DKI Jakarta 12430',
+                              _getAddress(
+                                  _user.userDetail!.invoiceBillAddress!),
                               style: TextStyle(height: 1.5),
                             ),
                           ),
@@ -210,7 +258,8 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child: Text('DESRIYADI'),
+                                child:
+                                    Text(_user.userDetail!.name.toUpperCase()),
                               )
                             ]),
                             TableRow(children: [
@@ -222,7 +271,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child: Text('2021-10-23 15:26:43.756'),
+                                child: Text(_item.orderData.orderTime),
                               )
                             ]),
                             TableRow(children: [
@@ -234,7 +283,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child: Text('2021-10-23 15:26:43.756'),
+                                child: Text('-'),
                               )
                             ]),
                             TableRow(children: [
@@ -246,8 +295,8 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                    'PT CCBI - East Java Plant, Jalan Raya Surabaya - Malang KM 43 Pandaan-Pasuruan, Surabaya, Indonesia'),
+                                child: Text(_getAddress(
+                                    _user.userDetail!.deliveryAddress)),
                               )
                             ]),
                           ],
@@ -316,10 +365,9 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                                         TextStyle(fontWeight: FontWeight.bold)),
                               ),
                               Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                    'Pt. Coca-Cola Bottling Indonesia, Jl. Teuku Umar Km 46, Desa Sukadanau, Cibitung - Bekasi, Jawa Barat 17520'),
-                              )
+                                  padding: const EdgeInsets.only(top: 8.0),
+                                  child: Text(_getAddress(_user.userDetail!
+                                      .invoiceBillingSettlementAddress!)))
                             ]),
                           ],
                         ),
@@ -339,7 +387,8 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                         ),
                       ),
                     ),
-                    _getOrderItem(),
+                    for (String key in _item.orderData.machineList.keys)
+                      _getOrderItem(_item.orderData.machineList[key]!),
                     const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -454,6 +503,13 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                           child: const Text('Cancel Order'),
                         )
                       ],
+                    ),
+                    Visibility(
+                      visible: !i,
+                      child: Text(
+                        'waiting for confirmation before approving',
+                        style: TextStyle(color: Colors.red),
+                      ),
                     ),
                     const SizedBox(height: 50),
                   ],
