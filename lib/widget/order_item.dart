@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 
 class OrderItem extends StatelessWidget {
   final Item item;
@@ -119,7 +121,9 @@ class OrderItem extends StatelessWidget {
                                 style: OutlinedButton.styleFrom(
                                     primary:
                                         const Color.fromRGBO(160, 152, 128, 1)),
-                                onPressed: () {},
+                                onPressed: () => Get.toNamed(
+                                    RouteConstant.deliveryNote,
+                                    arguments: item.toMap()),
                                 child: const Text('Delivery Note'),
                               ),
                               OutlinedButton(

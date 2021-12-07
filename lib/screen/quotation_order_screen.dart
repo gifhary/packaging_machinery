@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/item.dart';
-import 'package:packaging_machinery/model/order_data.dart';
 import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/widget/machine_table.dart';
 
@@ -143,13 +142,19 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(width: 100),
-                          SizedBox(
-                            width: 300,
-                            child: Text(
-                              _getAddress(
-                                  _user.userDetail!.invoiceBillAddress!),
-                              style: TextStyle(height: 1.5),
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(_user.userDetail!.company ?? ''),
+                              SizedBox(
+                                width: 300,
+                                child: Text(
+                                  _getAddress(
+                                      _user.userDetail!.invoiceBillAddress!),
+                                  style: TextStyle(height: 1.5),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
@@ -282,8 +287,15 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               ),
                               Padding(
                                   padding: const EdgeInsets.only(top: 8.0),
-                                  child: Text(_getAddress(_user.userDetail!
-                                      .invoiceBillingSettlementAddress!)))
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(_user.userDetail!.company ?? ''),
+                                      Text(_getAddress(_user.userDetail!
+                                          .invoiceBillingSettlementAddress!)),
+                                    ],
+                                  ))
                             ]),
                           ],
                         ),
