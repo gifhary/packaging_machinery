@@ -2,25 +2,25 @@ import 'dart:convert';
 
 class OrderData {
   String orderTitle;
-  bool approvedByCompany;
   bool approvedByCustomer;
   bool confirmedBySales;
+  bool delivered;
   String orderTime;
   String? deliveryNoteConfirmedDate;
   Map<String, MachineData> machineList;
 
   OrderData({
-    required this.confirmedBySales,
-    this.deliveryNoteConfirmedDate,
     required this.orderTitle,
-    required this.approvedByCompany,
     required this.approvedByCustomer,
+    required this.confirmedBySales,
+    required this.delivered,
     required this.orderTime,
+    this.deliveryNoteConfirmedDate,
     required this.machineList,
   });
 
   factory OrderData.fromMap(Map<String, dynamic> json) => OrderData(
-          approvedByCompany: json['approvedByCompany'],
+          delivered: json['delivered'],
           approvedByCustomer: json['approvedByCustomer'],
           orderTitle: json['orderTitle'],
           confirmedBySales: json['confirmedBySales'],
@@ -46,8 +46,8 @@ class OrderData {
           });
 
   Map<String, dynamic> toMap() => {
+        'delivered': delivered,
         "orderTitle": orderTitle,
-        'approvedByCompany': approvedByCompany,
         'approvedByCustomer': approvedByCustomer,
         "orderTime": orderTime,
         'confirmedBySales': confirmedBySales,

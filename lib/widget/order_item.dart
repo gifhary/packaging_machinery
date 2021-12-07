@@ -14,15 +14,19 @@ class OrderItem extends StatelessWidget {
 
     String _getStatus() {
       String status = '';
-      if (item.orderData.approvedByCompany &&
-          item.orderData.approvedByCustomer) {
-        status = 'On delivery';
-      } else if (!item.orderData.approvedByCompany &&
-          item.orderData.approvedByCustomer) {
-        status = 'Waiting for approval';
-      } else if (!item.orderData.approvedByCompany &&
-          !item.orderData.approvedByCustomer) {
-        status = 'On process';
+      if (!item.orderData.delivered) {
+        if (item.orderData.confirmedBySales &&
+            item.orderData.approvedByCustomer) {
+          status = 'On delivery';
+        } else if (item.orderData.confirmedBySales &&
+            !item.orderData.approvedByCustomer) {
+          status = 'Waiting for approval';
+        } else if (!item.orderData.confirmedBySales &&
+            !item.orderData.approvedByCustomer) {
+          status = 'On process';
+        }
+      } else {
+        status = 'Delivered';
       }
       return status;
     }
@@ -36,22 +40,28 @@ class OrderItem extends StatelessWidget {
       return (to.difference(from).inHours / 24).round();
     }
 
+    _onTap() {
+      if (!item.orderData.delivered) {
+        onTap(item);
+      }
+    }
+
     return Column(
       children: [
         InkWell(
-          onTap: () => onTap(item),
+          onTap: _onTap,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 SizedBox(
-                  width: _width * 0.35,
+                  width: _width * 0.5,
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       SizedBox(
-                        width: _width * 0.35,
+                        width: _width * 0.25,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -64,6 +74,21 @@ class OrderItem extends StatelessWidget {
                             ),
                             Text('Order ID: ${item.orderId}'),
                             Text('Status: ${_getStatus()}'),
+                            Visibility(
+                                visible: item.orderData.confirmedBySales &&
+                                    item.orderData.approvedByCustomer,
+                                child: Row(
+                                  children: [
+                                    Text('Tracking number: '),
+                                    Container(
+                                      decoration: BoxDecoration(
+                                          border: Border.all(
+                                              color: const Color.fromRGBO(
+                                                  222, 222, 222, 1))),
+                                      child: Text('109822873778'),
+                                    )
+                                  ],
+                                )),
                             item.orderData.deliveryNoteConfirmedDate == null
                                 ? Container()
                                 : Text(
@@ -76,6 +101,38 @@ class OrderItem extends StatelessWidget {
                           ],
                         ),
                       ),
+                      Visibility(
+                        visible: item.orderData.delivered,
+                        child: Flexible(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  primary:
+                                      const Color.fromRGBO(160, 152, 128, 1),
+                                ),
+                                onPressed: () {},
+                                child: const Text('Invoice'),
+                              ),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                    primary:
+                                        const Color.fromRGBO(160, 152, 128, 1)),
+                                onPressed: () {},
+                                child: const Text('Delivery Note'),
+                              ),
+                              OutlinedButton(
+                                style: OutlinedButton.styleFrom(
+                                    primary:
+                                        const Color.fromRGBO(160, 152, 128, 1)),
+                                onPressed: () {},
+                                child: const Text('Payment'),
+                              )
+                            ],
+                          ),
+                        ),
+                      )
                     ],
                   ),
                 ),
