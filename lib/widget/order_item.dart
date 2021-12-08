@@ -114,7 +114,9 @@ class OrderItem extends StatelessWidget {
                                   primary:
                                       const Color.fromRGBO(160, 152, 128, 1),
                                 ),
-                                onPressed: () {},
+                                onPressed: () => Get.toNamed(
+                                    RouteConstant.invoice,
+                                    arguments: item.toMap()),
                                 child: const Text('Invoice'),
                               ),
                               OutlinedButton(

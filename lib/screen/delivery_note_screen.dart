@@ -1,3 +1,6 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -51,6 +54,10 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
       str += address.country + '.';
     }
     return str;
+  }
+
+  String getMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
   }
 
   @override
@@ -128,7 +135,7 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'PT Coca-Cola Bottling Indonesia',
+                            _user.userDetail!.company ?? '',
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                           SizedBox(height: 5),
@@ -150,8 +157,9 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                       ),
                     ),
                     SizedBox(
-                      width: 300,
+                      width: 350,
                       child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
@@ -164,11 +172,11 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                               Text('Customer Id',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 5),
+                              SizedBox(height: 20),
                               Text('Ref No.',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 5),
+                              SizedBox(height: 40),
                               Text('Rn No',
                                   style:
                                       TextStyle(fontWeight: FontWeight.bold)),
@@ -179,11 +187,45 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                             children: [
                               Text(DateTime.now().toString()),
                               SizedBox(height: 5),
-                              Text('d6fb7961400d219'),
+                              Text(getMd5(_user.email)),
                               SizedBox(height: 5),
-                              Text('21/129'),
+                              SizedBox(
+                                width: 150,
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: "Enter Ref no",
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Color.fromRGBO(117, 111, 99, 1),
+                                          width: 1),
+                                    ),
+                                    enabledBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.red, width: 1),
+                                    ),
+                                  ),
+                                ),
+                              ),
                               SizedBox(height: 5),
-                              Text('2')
+                              SizedBox(
+                                width: 150,
+                                child: TextField(
+                                  decoration: InputDecoration(
+                                    hintText: "Enter RN no",
+                                    focusedBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color:
+                                              Color.fromRGBO(117, 111, 99, 1),
+                                          width: 1),
+                                    ),
+                                    enabledBorder: const OutlineInputBorder(
+                                      borderSide: BorderSide(
+                                          color: Colors.red, width: 1),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ],
@@ -194,63 +236,6 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                 SizedBox(height: 20),
                 for (String key in _item.orderData.machineList.keys)
                   MachineTable(machineData: _item.orderData.machineList[key]!),
-                const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'RN',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Date',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Name',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                    SizedBox(width: 20),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color:
-                                      const Color.fromRGBO(160, 152, 128, 1))),
-                          child: Text('10982'),
-                        ),
-                        SizedBox(height: 10),
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color:
-                                      const Color.fromRGBO(160, 152, 128, 1))),
-                          child: Text(DateTime.now().toString()),
-                        ),
-                        SizedBox(height: 10),
-                        Container(
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                              border: Border.all(
-                                  color:
-                                      const Color.fromRGBO(160, 152, 128, 1))),
-                          child: Text(_user.userDetail?.name ?? ''),
-                        )
-                      ],
-                    )
-                  ],
-                ),
                 const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
                 SizedBox(height: 15),
                 Text('Remarks,', style: TextStyle(fontStyle: FontStyle.italic)),
