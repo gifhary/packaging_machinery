@@ -1,9 +1,10 @@
 import 'dart:convert';
-
+import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:image_picker_web/image_picker_web.dart';
 import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/user.dart';
@@ -17,6 +18,7 @@ class DeliveryNoteScreen extends StatefulWidget {
 class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
   final Item _item = Item.fromMap(Get.arguments);
   late User _user;
+  late Uint8List imageFile = Uint8List(0);
 
   @override
   void initState() {
@@ -58,6 +60,13 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
 
   String getMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
+  }
+
+  _uploadCustomerSignature() {
+    ImagePickerWeb.getImage(outputType: ImageType.bytes).then((value) {
+      if (value != null) imageFile = value as Uint8List;
+      setState(() {});
+    });
   }
 
   @override
@@ -249,7 +258,7 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                         Container(
                           height: 200,
                           width: 300,
-                          color: Colors.grey,
+                          color: Colors.grey.withOpacity(0.5),
                         ),
                         Container(
                           margin: EdgeInsets.all(15),
@@ -270,7 +279,25 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                         Container(
                           height: 200,
                           width: 300,
-                          color: Colors.grey,
+                          color: Colors.grey.withOpacity(0.5),
+                          child: InkWell(
+                            onTap: _uploadCustomerSignature,
+                            child: imageFile.isNotEmpty
+                                ? Image.memory(
+                                    imageFile,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.upload_file),
+                                      Text(
+                                        'upload stamp and signature',
+                                        style: TextStyle(color: Colors.grey),
+                                      )
+                                    ],
+                                  ),
+                          ),
                         ),
                         Container(
                           margin: EdgeInsets.all(15),
