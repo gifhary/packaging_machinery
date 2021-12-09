@@ -18,7 +18,7 @@ class DeliveryNoteScreen extends StatefulWidget {
 class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
   final Item _item = Item.fromMap(Get.arguments);
   late User _user;
-  late Uint8List imageFile = Uint8List(0);
+  Uint8List imageFile = Uint8List(0);
 
   @override
   void initState() {

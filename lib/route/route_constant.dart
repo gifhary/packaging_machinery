@@ -9,4 +9,5 @@ class RouteConstant {
   static const quotationOrder = '$profile/quotationOrder';
   static const deliveryNote = '$profile/deliveryNote';
   static const invoice = '$profile/invoice';
+  static const payment = '$profile/payment';
 }

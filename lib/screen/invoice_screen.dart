@@ -68,7 +68,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
       if (image != null) {
         js.context.callMethod("saveAs", [
           html.Blob([image]),
-          'invoice.png'
+          'invoice${_item.orderId}.png'
         ]);
       }
     });
@@ -201,7 +201,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
                                     SizedBox(height: 5),
-                                    Text('Rn No',
+                                    Text('RN No',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold)),
                                   ],
@@ -232,7 +232,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
                                 'Total',

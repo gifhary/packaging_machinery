@@ -6,6 +6,7 @@ import 'package:packaging_machinery/screen/home_screen.dart';
 import 'package:packaging_machinery/screen/invoice_screen.dart';
 import 'package:packaging_machinery/screen/login_screen.dart';
 import 'package:packaging_machinery/screen/order_now_screen.dart';
+import 'package:packaging_machinery/screen/payment_screen.dart';
 import 'package:packaging_machinery/screen/profile_screen.dart';
 import 'package:packaging_machinery/screen/quotation_order_screen.dart';
 import 'package:packaging_machinery/screen/register_screen.dart';
@@ -26,6 +27,7 @@ class AppRoute {
         name: RouteConstant.quotationOrder,
         page: () => const QuotationOrderScreen()),
     GetPage(name: RouteConstant.deliveryNote, page: () => DeliveryNoteScreen()),
-    GetPage(name: RouteConstant.invoice, page: () => InvoiceScreen())
+    GetPage(name: RouteConstant.invoice, page: () => InvoiceScreen()),
+    GetPage(name: RouteConstant.payment, page: () => PaymentScreen()),
   ];
 }
