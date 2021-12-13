@@ -94,7 +94,13 @@ class _AppBarWidgetState extends State<AppBarWidget> {
               width: 20,
             ),
             InkWell(
-              onTap: () => Get.offNamed(RouteConstant.bookOnline),
+              onTap: () {
+                if (_user == null) {
+                  Get.toNamed(RouteConstant.login);
+                } else {
+                  Get.offNamed(RouteConstant.bookOnline);
+                }
+              },
               child: const Text('BOOK ONLINE'),
             ),
             const SizedBox(

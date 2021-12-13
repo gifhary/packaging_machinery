@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/utils/texts.dart';
 import 'package:packaging_machinery/widget/app_bar.dart';
@@ -14,9 +16,19 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final ScrollController _scrollController = ScrollController();
 
+  User? _user;
+
+  _checkLoginStatus() {
+    GetStorage box = GetStorage();
+    var data = box.read('user');
+    if (data == null) return;
+    _user = User.fromJson(data);
+  }
+
   @override
   void initState() {
     super.initState();
+    _checkLoginStatus();
     if (Get.arguments?['contactUs'] ?? false) {
       WidgetsBinding.instance!.addPostFrameCallback((_) {
         Future.delayed(const Duration(seconds: 1), () {
@@ -87,7 +99,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     InkWell(
-                      onTap: () => Get.offNamed(RouteConstant.bookOnline),
+                      onTap: () {
+                        if (_user == null) {
+                          Get.toNamed(RouteConstant.login);
+                        } else {
+                          Get.offNamed(RouteConstant.bookOnline);
+                        }
+                      },
                       child: const Text(
                         'BOOK ONLINE',
                         style: TextStyle(
