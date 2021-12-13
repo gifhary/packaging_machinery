@@ -8,6 +8,7 @@ import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/user.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/widget/machine_table.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:html' as html; //ignore: avoid_web_libraries_in_flutter
@@ -379,7 +380,8 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
                             InkWell(
-                              onTap: () {},
+                              onTap: () => Get.toNamed(RouteConstant.payment,
+                                  arguments: _item.toMap()),
                               child: Text(
                                 'Upload Payment Proof',
                                 style: TextStyle(

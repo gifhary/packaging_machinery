@@ -30,6 +30,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
     var data = box.read('user');
     if (data == null) return;
     _user = User.fromJson(data);
+    approverController.text = _user.userDetail!.name;
   }
 
   String _getAddress(Address address) {

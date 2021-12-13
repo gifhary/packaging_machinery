@@ -1,9 +1,14 @@
+import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/user.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:html' as html; //ignore: avoid_web_libraries_in_flutter
 import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
@@ -15,9 +20,24 @@ class PaymentScreen extends StatefulWidget {
 
 class _PaymentScreenState extends State<PaymentScreen> {
   final Item _item = Item.fromMap(Get.arguments);
+  final TextEditingController _paymentDate = TextEditingController();
 
   Uint8List imageFile = Uint8List(0);
   ScreenshotController screenshotController = ScreenshotController();
+  late User _user;
+
+  @override
+  void initState() {
+    _getLocalUserData();
+    super.initState();
+  }
+
+  _getLocalUserData() {
+    GetStorage box = GetStorage();
+    var data = box.read('user');
+    if (data == null) return;
+    _user = User.fromJson(data);
+  }
 
   _uploadPaymenProof() {
     ImagePickerWeb.getImage(outputType: ImageType.bytes).then((value) {
@@ -37,6 +57,35 @@ class _PaymentScreenState extends State<PaymentScreen> {
         ]);
       }
     });
+  }
+
+  String _getAddress(Address address) {
+    String str = '';
+    debugPrint(address.toString());
+
+    if (address.address1.isNotEmpty) {
+      str += address.address1 + ', ';
+    }
+    if (address.address2?.isNotEmpty ?? false) {
+      str += address.address2! + ', ';
+    }
+    if (address.street?.isNotEmpty ?? false) {
+      str += address.street! + ', ';
+    }
+    if (address.city.isNotEmpty) {
+      str += address.city + ', ';
+    }
+    if (address.zipcode.isNotEmpty) {
+      str += address.zipcode + ', ';
+    }
+    if (address.country.isNotEmpty) {
+      str += address.country + '.';
+    }
+    return str;
+  }
+
+  String getMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
   }
 
   @override
@@ -83,16 +132,17 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                   fontSize: 30, fontWeight: FontWeight.bold),
                             ),
                             Text(
-                              'Order: id',
+                              'Order: ${_item.orderId}',
                               style: TextStyle(fontSize: 30),
                             ),
                           ],
                         ),
                         SizedBox(height: 20),
-                        Text('PT Coca-Cola Bottling Indonesia'),
-                        Text('South Quarter Tower C Lantai 22 (PH)'),
-                        Text('Jl. RA Kartini Kav. 8'),
-                        Text('Jakarta Utara'),
+                        Text(_user.userDetail!.company ?? ''),
+                        SizedBox(
+                            width: 250,
+                            child: Text(_getAddress(
+                                _user.userDetail!.deliveryAddress))),
                         Divider(color: Color.fromRGBO(160, 152, 128, 1)),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -115,10 +165,11 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             fontWeight: FontWeight.bold)),
                                   ],
                                 ),
+                                SizedBox(width: 20),
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text('fwaefe'),
+                                    Text(getMd5(_user.email)),
                                     SizedBox(height: 5),
                                     Text('21/129'),
                                     SizedBox(height: 5),
@@ -226,6 +277,10 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                       SizedBox(width: 10),
                                       Flexible(
                                         child: TextField(
+                                          onChanged: (value) {
+                                            setState(() {});
+                                          },
+                                          controller: _paymentDate,
                                           decoration: InputDecoration(
                                             focusedBorder:
                                                 const OutlineInputBorder(
@@ -254,7 +309,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         primary: const Color.fromRGBO(
                                             160, 152, 128, 1),
                                       ),
-                                      onPressed: () {},
+                                      onPressed: _paymentDate.text.isNotEmpty
+                                          ? () {}
+                                          : null,
                                       child: const Text('Submit'),
                                     ),
                                   ),

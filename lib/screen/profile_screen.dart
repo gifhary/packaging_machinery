@@ -153,16 +153,16 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               const SizedBox(width: 10),
                               Column(
                                 crossAxisAlignment: CrossAxisAlignment.start,
-                                children: const [
+                                children: [
                                   Text(
-                                    'User Name',
+                                    _user.userDetail?.name ?? '',
                                     style: TextStyle(
                                       fontSize: 30,
                                       color: Colors.white,
                                     ),
                                   ),
                                   Text(
-                                    'Customer/Admin',
+                                    _user.email,
                                     style: TextStyle(color: Colors.white),
                                   )
                                 ],
