@@ -234,7 +234,16 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child: Text('-'),
+                                child: Text(
+                                  _item.orderData.confirmedBySales
+                                      ? DateUtils.dateOnly(DateTime.now())
+                                          .toString()
+                                      : '(waiting for confirmation)',
+                                  style: TextStyle(
+                                      color: _item.orderData.confirmedBySales
+                                          ? Colors.black
+                                          : Colors.grey),
+                                ),
                               )
                             ]),
                             TableRow(children: [
