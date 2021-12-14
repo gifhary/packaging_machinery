@@ -76,7 +76,24 @@ class MachineTable extends StatelessWidget {
             for (String key in machineData.partRequest.keys)
               DataRow(
                 cells: <DataCell>[
-                  DataCell(Text(machineData.partRequest[key]!.itemName)),
+                  DataCell(Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(machineData.partRequest[key]!.itemName),
+                      SizedBox(
+                        width: 200,
+                        child: Text(
+                          '*estimated time of arrival: 20/05/2021',
+                          style: TextStyle(
+                              color: Colors.blue,
+                              fontSize: 12,
+                              fontStyle: FontStyle.italic,
+                              fontWeight: FontWeight.w100,
+                              letterSpacing: 0.5),
+                        ),
+                      )
+                    ],
+                  )),
                   DataCell(Text(machineData.partRequest[key]!.partNumber)),
                   DataCell(
                       Text(machineData.partRequest[key]!.quantity.toString())),

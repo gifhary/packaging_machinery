@@ -1,9 +1,15 @@
+import 'dart:convert';
+import 'package:crypto/crypto.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:packaging_machinery/constant/db_constant.dart';
 import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/order_data.dart';
 import 'package:packaging_machinery/model/user.dart';
+import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/widget/machine_table.dart';
 
 class QuotationOrderScreen extends StatefulWidget {
@@ -15,13 +21,17 @@ class QuotationOrderScreen extends StatefulWidget {
 
 class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
   final Item _item = Item.fromMap(Get.arguments);
-  final bool i = false;
   final TextEditingController approverController = TextEditingController();
   late User _user;
+  final db = FirebaseDatabase.instance.reference();
+  late DatabaseReference order;
+  late DatabaseReference cancelledOrder;
 
   @override
   void initState() {
     _getLocalUserData();
+    order = db.child(DbConstant.order);
+    cancelledOrder = db.child(DbConstant.cancelledOrder);
     super.initState();
   }
 
@@ -31,6 +41,25 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
     if (data == null) return;
     _user = User.fromJson(data);
     approverController.text = _user.userDetail!.name;
+  }
+
+  _cancelOrder(String orderId, OrderData data) {
+    cancelledOrder
+        .child('${getMd5(_user.email)}/$orderId')
+        .set(data.toMap())
+        .then((value) {
+      _deleteOrder(orderId);
+    });
+  }
+
+  _deleteOrder(String orderId) {
+    order.child('${getMd5(_user.email)}/$orderId').remove().then((value) {
+      debugPrint('order cancelled');
+    });
+  }
+
+  String getMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
   }
 
   String _getAddress(Address address) {
@@ -104,7 +133,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                           'Order: ${_item.orderId} ',
                           style: TextStyle(fontSize: 30),
                         ),
-                        !i
+                        !_item.orderData.confirmedBySales
                             ? Text(
                                 '(waiting for confirmation)',
                                 style:
@@ -422,20 +451,24 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                           style: ElevatedButton.styleFrom(
                             primary: const Color.fromRGBO(160, 152, 128, 1),
                           ),
-                          onPressed: i ? () {} : null,
+                          onPressed:
+                              _item.orderData.confirmedBySales ? () {} : null,
                           child: const Text('Approve'),
                         ),
                         const SizedBox(width: 30),
                         OutlinedButton(
                           style: OutlinedButton.styleFrom(
                               primary: const Color.fromRGBO(160, 152, 128, 1)),
-                          onPressed: () {},
+                          onPressed: () {
+                            _cancelOrder(_item.orderId, _item.orderData);
+                            Get.offAllNamed(RouteConstant.home);
+                          },
                           child: const Text('Cancel Order'),
                         )
                       ],
                     ),
                     Visibility(
-                      visible: !i,
+                      visible: !_item.orderData.confirmedBySales,
                       child: Text(
                         'waiting for confirmation before approving',
                         style: TextStyle(color: Colors.red),
