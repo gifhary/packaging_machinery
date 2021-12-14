@@ -2,10 +2,12 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:packaging_machinery/constant/storage_constant.dart';
 import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/user.dart';
@@ -29,6 +31,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
   @override
   void initState() {
     _getLocalUserData();
+
     super.initState();
   }
 
@@ -39,11 +42,22 @@ class _PaymentScreenState extends State<PaymentScreen> {
     _user = User.fromJson(data);
   }
 
-  _uploadPaymenProof() {
+  _getPaymentProof() {
     ImagePickerWeb.getImage(outputType: ImageType.bytes).then((value) {
       if (value != null) imageFile = value as Uint8List;
       setState(() {});
     });
+  }
+
+  _uploadPaymentProof() async {
+    final storage = FirebaseStorage.instance.ref(
+        '${StorageConstant.paymentProof}${_paymentDate.text}${_item.orderId}.png');
+
+    TaskSnapshot uploadTask = await storage.putData(
+        imageFile, SettableMetadata(contentType: 'image/png'));
+
+    String url = await uploadTask.ref.getDownloadURL();
+    debugPrint(url);
   }
 
   _downloadProofForm() async {
@@ -244,7 +258,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                           width: double.infinity,
                           color: Colors.grey.withOpacity(0.5),
                           child: InkWell(
-                            onTap: _uploadPaymenProof,
+                            onTap: _getPaymentProof,
                             child: imageFile.isNotEmpty
                                 ? Image.memory(
                                     imageFile,
@@ -309,8 +323,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         primary: const Color.fromRGBO(
                                             160, 152, 128, 1),
                                       ),
-                                      onPressed: _paymentDate.text.isNotEmpty
-                                          ? () {}
+                                      onPressed: _paymentDate.text.isNotEmpty &&
+                                              imageFile.isNotEmpty
+                                          ? _uploadPaymentProof
                                           : null,
                                       child: const Text('Submit'),
                                     ),
