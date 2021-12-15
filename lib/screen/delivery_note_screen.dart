@@ -350,7 +350,8 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                               Container(
                                 height: 200,
                                 width: 300,
-                                color: Colors.grey.withOpacity(0.5),
+                                child: Image.network(
+                                    'https://firebasestorage.googleapis.com/v0/b/packaging-machinery.appspot.com/o/companyAsset%2Fdelivery-note-stamp.png?alt=media&token=86c60e7b-94b0-46e1-b642-359681cee7e0'),
                               ),
                               Container(
                                 margin: EdgeInsets.all(15),
