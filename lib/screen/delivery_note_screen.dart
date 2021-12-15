@@ -1,11 +1,16 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:crypto/crypto.dart';
+import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:packaging_machinery/constant/db_constant.dart';
+import 'package:packaging_machinery/constant/storage_constant.dart';
 import 'package:packaging_machinery/model/address.dart';
+import 'package:packaging_machinery/model/delivery_note.dart';
 import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/widget/machine_table.dart';
@@ -16,14 +21,38 @@ class DeliveryNoteScreen extends StatefulWidget {
 }
 
 class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
+  final db = FirebaseDatabase.instance.reference();
   final Item _item = Item.fromMap(Get.arguments);
   late User _user;
   Uint8List imageFile = Uint8List(0);
 
+  final TextEditingController _refNo = TextEditingController();
+  final TextEditingController _rnNo = TextEditingController();
+
+  DeliveryNote? _note;
+  bool _loading = true;
+
   @override
   void initState() {
     _getLocalUserData();
+    WidgetsBinding.instance!
+        .addPostFrameCallback((_) => _getDeliveryNoteStatus());
     super.initState();
+  }
+
+  _getDeliveryNoteStatus() {
+    final deliveryNote = db.child(DbConstant.deliveryNote);
+    deliveryNote
+        .child(getMd5(_user.email) + '/' + _item.orderId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        _note = DeliveryNote.fromMap(value.value);
+        debugPrint(value.value.toString());
+      }
+      _loading = false;
+      setState(() {});
+    });
   }
 
   _getLocalUserData() {
@@ -62,10 +91,46 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
     return md5.convert(utf8.encode(input)).toString();
   }
 
-  _uploadCustomerSignature() {
+  _getCustomerSignature() {
     ImagePickerWeb.getImage(outputType: ImageType.bytes).then((value) {
       if (value != null) imageFile = value as Uint8List;
       setState(() {});
+    });
+  }
+
+  _submitDeliveryNote() async {
+    final storage = FirebaseStorage.instance.ref(
+        '${StorageConstant.deliveryNote}signature-${DateTime.now().toString().split(' ')[0]}${_item.orderId}.png');
+
+    TaskSnapshot uploadTask = await storage.putData(
+        imageFile, SettableMetadata(contentType: 'image/png'));
+
+    uploadTask.ref.getDownloadURL().then((url) =>
+        _saveDeliveryNote(url, DateTime.now().toString().split(' ')[0]));
+  }
+
+  _saveDeliveryNote(String imgUrl, date) {
+    final deliveryNote = db.child(DbConstant.deliveryNote);
+    deliveryNote.child(getMd5(_user.email)).set({
+      _item.orderId: DeliveryNote(
+        date: date,
+        imgUrl: imgUrl,
+        refNo: _refNo.text,
+        rnNo: _rnNo.text,
+      ).toMap()
+    }).then((value) {
+      Get.defaultDialog(
+          titleStyle: const TextStyle(color: Color.fromRGBO(117, 111, 99, 1)),
+          title: "Success",
+          middleText: "Delivery note has been submitted!",
+          onConfirm: Get.back,
+          buttonColor: const Color.fromRGBO(117, 111, 99, 1),
+          confirmTextColor: Colors.white,
+          textConfirm: 'OK');
+      setState(() {
+        _note = DeliveryNote(
+            refNo: _refNo.text, rnNo: _rnNo.text, date: date, imgUrl: imgUrl);
+      });
     });
   }
 
@@ -96,239 +161,282 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
           height: double.infinity,
           width: _width * 0.75,
           color: Colors.white,
-          child: SingleChildScrollView(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      'Delivery Note ',
-                      style:
-                          TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-                    ),
-                    Text(
-                      'Order: ${_item.orderId}',
-                      style: TextStyle(fontSize: 30),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text('PT KHS PACKAGING MACHINERY INDONESIA'),
-                        Text('THE PRIME - Office Sunter, 3rd floor'),
-                        Text('Jl. Yos Sudarso Kav. 30 Sunter Agun'),
-                        Text('Jakarta Utara'),
-                      ],
-                    ),
-                    Image.asset(
-                      'assets/img/khs_logo.png',
-                      width: 234,
-                      height: 72,
-                      fit: BoxFit.contain,
-                    ),
-                  ],
-                ),
-                const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    SizedBox(
-                      width: 250,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+          child: _loading
+              ? Container(
+                  color: Colors.white,
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              : SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
                           Text(
-                            _user.userDetail!.company ?? '',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            'Delivery Note ',
+                            style: TextStyle(
+                                fontSize: 30, fontWeight: FontWeight.bold),
                           ),
-                          SizedBox(height: 5),
                           Text(
-                            _getAddress(_user.userDetail!.deliveryAddress),
-                            style: TextStyle(height: 1.5),
+                            'Order: ${_item.orderId}',
+                            style: TextStyle(fontSize: 30),
                           ),
-                          SizedBox(height: 15),
-                          Row(
-                            children: [
-                              Text('ATTENTION: '),
-                              Text(
-                                'SPAREPART DEPARTMENT',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          )
                         ],
                       ),
-                    ),
-                    SizedBox(
-                      width: 350,
-                      child: Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      SizedBox(height: 10),
+                      Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('Date',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 5),
-                              Text('Customer Id',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 20),
-                              Text('Ref No.',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
-                              SizedBox(height: 40),
-                              Text('Rn No',
-                                  style:
-                                      TextStyle(fontWeight: FontWeight.bold)),
+                              Text('PT KHS PACKAGING MACHINERY INDONESIA'),
+                              Text('THE PRIME - Office Sunter, 3rd floor'),
+                              Text('Jl. Yos Sudarso Kav. 30 Sunter Agun'),
+                              Text('Jakarta Utara'),
+                            ],
+                          ),
+                          Image.asset(
+                            'assets/img/khs_logo.png',
+                            width: 234,
+                            height: 72,
+                            fit: BoxFit.contain,
+                          ),
+                        ],
+                      ),
+                      const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          SizedBox(
+                            width: 250,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  _user.userDetail!.company ?? '',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                SizedBox(height: 5),
+                                Text(
+                                  _getAddress(
+                                      _user.userDetail!.deliveryAddress),
+                                  style: TextStyle(height: 1.5),
+                                ),
+                                SizedBox(height: 15),
+                                Row(
+                                  children: [
+                                    Text('ATTENTION: '),
+                                    Text(
+                                      'SPAREPART DEPARTMENT',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  ],
+                                )
+                              ],
+                            ),
+                          ),
+                          SizedBox(
+                            width: 350,
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text('Date',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(height: 5),
+                                    Text('Customer Id',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(height: _note != null ? 5 : 20),
+                                    Text('Ref No.',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                    SizedBox(height: _note != null ? 5 : 40),
+                                    Text('Rn No',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold)),
+                                  ],
+                                ),
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    _note != null
+                                        ? Text('${_note!.date}')
+                                        : Text(DateTime.now()
+                                            .toString()
+                                            .split(' ')[0]),
+                                    SizedBox(height: 5),
+                                    Text(getMd5(_user.email)),
+                                    SizedBox(height: 5),
+                                    _note != null
+                                        ? Text('${_note!.refNo}')
+                                        : SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              onChanged: (s) => setState(() {}),
+                                              controller: _refNo,
+                                              decoration: InputDecoration(
+                                                hintText: "Enter Ref no",
+                                                focusedBorder:
+                                                    const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Color.fromRGBO(
+                                                          117, 111, 99, 1),
+                                                      width: 1),
+                                                ),
+                                                enabledBorder:
+                                                    const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.red,
+                                                      width: 1),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                    SizedBox(height: 5),
+                                    _note != null
+                                        ? Text('${_note!.rnNo}')
+                                        : SizedBox(
+                                            width: 150,
+                                            child: TextField(
+                                              onChanged: (s) => setState(() {}),
+                                              controller: _rnNo,
+                                              decoration: InputDecoration(
+                                                hintText: "Enter RN no",
+                                                focusedBorder:
+                                                    const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Color.fromRGBO(
+                                                          117, 111, 99, 1),
+                                                      width: 1),
+                                                ),
+                                                enabledBorder:
+                                                    const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Colors.red,
+                                                      width: 1),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      for (String key in _item.orderData.machineList.keys)
+                        MachineTable(
+                            machineData: _item.orderData.machineList[key]!),
+                      const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
+                      SizedBox(height: 15),
+                      Text('Remarks,',
+                          style: TextStyle(fontStyle: FontStyle.italic)),
+                      SizedBox(height: 100),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            children: [
+                              Container(
+                                height: 200,
+                                width: 300,
+                                color: Colors.grey.withOpacity(0.5),
+                              ),
+                              Container(
+                                margin: EdgeInsets.all(15),
+                                width: 150,
+                                height: 2,
+                                color: Colors.black,
+                              ),
+                              Text(
+                                'LEONI ANDRIYATI',
+                                style: TextStyle(fontWeight: FontWeight.bold),
+                              ),
+                              SizedBox(height: 10),
+                              Text('KHS Packaging Machinery Indonesia')
                             ],
                           ),
                           Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(DateTime.now().toString()),
-                              SizedBox(height: 5),
-                              Text(getMd5(_user.email)),
-                              SizedBox(height: 5),
-                              SizedBox(
-                                width: 150,
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Enter Ref no",
-                                    focusedBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Color.fromRGBO(117, 111, 99, 1),
-                                          width: 1),
-                                    ),
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.red, width: 1),
-                                    ),
-                                  ),
+                              Container(
+                                height: 200,
+                                width: 300,
+                                color: Colors.grey.withOpacity(0.5),
+                                child: InkWell(
+                                  onTap: _note == null
+                                      ? _getCustomerSignature
+                                      : null,
+                                  child: imageFile.isNotEmpty
+                                      ? Image.memory(
+                                          imageFile,
+                                          fit: BoxFit.cover,
+                                        )
+                                      : _note?.imgUrl.isNotEmpty ?? false
+                                          ? Image.network(
+                                              _note!.imgUrl,
+                                              fit: BoxFit.cover,
+                                            )
+                                          : Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Icon(Icons.upload_file),
+                                                Text(
+                                                  'upload stamp and signature',
+                                                  style: TextStyle(
+                                                      color: Colors.grey),
+                                                )
+                                              ],
+                                            ),
                                 ),
                               ),
-                              SizedBox(height: 5),
-                              SizedBox(
+                              Container(
+                                margin: EdgeInsets.all(15),
                                 width: 150,
-                                child: TextField(
-                                  decoration: InputDecoration(
-                                    hintText: "Enter RN no",
-                                    focusedBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color:
-                                              Color.fromRGBO(117, 111, 99, 1),
-                                          width: 1),
-                                    ),
-                                    enabledBorder: const OutlineInputBorder(
-                                      borderSide: BorderSide(
-                                          color: Colors.red, width: 1),
-                                    ),
-                                  ),
-                                ),
+                                height: 2,
+                                color: Colors.black,
+                              ),
+                              Text(
+                                _user.userDetail?.name ?? '',
+                                style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
                         ],
                       ),
-                    )
-                  ],
-                ),
-                SizedBox(height: 20),
-                for (String key in _item.orderData.machineList.keys)
-                  MachineTable(machineData: _item.orderData.machineList[key]!),
-                const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
-                SizedBox(height: 15),
-                Text('Remarks,', style: TextStyle(fontStyle: FontStyle.italic)),
-                SizedBox(height: 100),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Column(
-                      children: [
-                        Container(
-                          height: 200,
-                          width: 300,
-                          color: Colors.grey.withOpacity(0.5),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(15),
-                          width: 150,
-                          height: 2,
-                          color: Colors.black,
-                        ),
-                        Text(
-                          'LEONI ANDRIYATI',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 10),
-                        Text('KHS Packaging Machinery Indonesia')
-                      ],
-                    ),
-                    Column(
-                      children: [
-                        Container(
-                          height: 200,
-                          width: 300,
-                          color: Colors.grey.withOpacity(0.5),
-                          child: InkWell(
-                            onTap: _uploadCustomerSignature,
-                            child: imageFile.isNotEmpty
-                                ? Image.memory(
-                                    imageFile,
-                                    fit: BoxFit.cover,
-                                  )
-                                : Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(Icons.upload_file),
-                                      Text(
-                                        'upload stamp and signature',
-                                        style: TextStyle(color: Colors.grey),
-                                      )
-                                    ],
+                      _note != null
+                          ? Container()
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    primary:
+                                        const Color.fromRGBO(160, 152, 128, 1),
                                   ),
-                          ),
-                        ),
-                        Container(
-                          margin: EdgeInsets.all(15),
-                          width: 150,
-                          height: 2,
-                          color: Colors.black,
-                        ),
-                        Text(
-                          _user.userDetail?.name ?? '',
-                          style: TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                      ],
-                    ),
-                  ],
+                                  onPressed: _refNo.text.isNotEmpty &&
+                                          _rnNo.text.isNotEmpty &&
+                                          imageFile.isNotEmpty
+                                      ? _submitDeliveryNote
+                                      : null,
+                                  child: const Text('Submit'),
+                                ),
+                              ],
+                            ),
+                      const SizedBox(height: 50),
+                    ],
+                  ),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: const Color.fromRGBO(160, 152, 128, 1),
-                      ),
-                      onPressed: () {},
-                      child: const Text('Submit'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 50),
-              ],
-            ),
-          ),
         ),
         Container(
           color: const Color.fromRGBO(117, 111, 99, 1),

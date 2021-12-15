@@ -1,9 +1,16 @@
+import 'dart:convert';
+
+import 'package:crypto/crypto.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:get_storage/get_storage.dart';
+import 'package:packaging_machinery/constant/db_constant.dart';
 import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
 
-class OrderItem extends StatelessWidget {
+class OrderItem extends StatefulWidget {
   final Item item;
   final Function(Item) onTap;
 
@@ -11,43 +18,102 @@ class OrderItem extends StatelessWidget {
       : super(key: key);
 
   @override
+  State<OrderItem> createState() => _OrderItemState();
+}
+
+class _OrderItemState extends State<OrderItem> {
+  bool _deliveryNoteSubmitted = false;
+
+  final db = FirebaseDatabase.instance.reference();
+  late User _user;
+  String _status = '';
+
+  @override
+  void initState() {
+    _getStatus();
+    _getLocalUserData();
+    WidgetsBinding.instance!
+        .addPostFrameCallback((_) => _getDeliveryNoteStatus());
+    super.initState();
+  }
+
+  _getDeliveryNoteStatus() {
+    final deliveryNote = db.child(DbConstant.deliveryNote);
+    deliveryNote
+        .child(getMd5(_user.email) + '/' + widget.item.orderId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        setState(() {
+          _deliveryNoteSubmitted = true;
+        });
+        _getPaymentProofStatus();
+      }
+    });
+  }
+
+  _getPaymentProofStatus() {
+    final paymentProof = db.child(DbConstant.paymentProof);
+    paymentProof
+        .child(getMd5(_user.email) + '/' + widget.item.orderId)
+        .get()
+        .then((value) {
+      if (value.exists) {
+        setState(() {
+          //order complete when delivery note and payment proof submitted
+          _status = 'Completed';
+        });
+      }
+    });
+  }
+
+  String getMd5(String input) {
+    return md5.convert(utf8.encode(input)).toString();
+  }
+
+  _getLocalUserData() {
+    GetStorage box = GetStorage();
+    var data = box.read('user');
+    if (data == null) return;
+    _user = User.fromJson(data);
+  }
+
+  _getStatus() {
+    if (!widget.item.orderData.delivered) {
+      if (widget.item.orderData.confirmedBySales &&
+          widget.item.orderData.approvedByCustomer) {
+        _status = 'On delivery';
+      } else if (widget.item.orderData.confirmedBySales &&
+          !widget.item.orderData.approvedByCustomer) {
+        _status = 'Waiting for approval';
+      } else if (!widget.item.orderData.confirmedBySales &&
+          !widget.item.orderData.approvedByCustomer) {
+        _status = 'On process';
+      }
+    } else {
+      _status = 'Delivered';
+    }
+  }
+
+  int daysBetween() {
+    DateTime from =
+        DateTime.parse(widget.item.orderData.deliveryNoteConfirmedDate!);
+    DateTime to = DateTime.now();
+
+    from = DateTime(from.year, from.month, from.day);
+    to = DateTime(to.year, to.month, to.day);
+    return (to.difference(from).inHours / 24).round();
+  }
+
+  _onTap() {
+    if (!widget.item.orderData.delivered) {
+      widget.onTap(widget.item);
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     double _width = MediaQuery.of(context).size.width;
-
-    String _getStatus() {
-      String status = '';
-      if (!item.orderData.delivered) {
-        if (item.orderData.confirmedBySales &&
-            item.orderData.approvedByCustomer) {
-          status = 'On delivery';
-        } else if (item.orderData.confirmedBySales &&
-            !item.orderData.approvedByCustomer) {
-          status = 'Waiting for approval';
-        } else if (!item.orderData.confirmedBySales &&
-            !item.orderData.approvedByCustomer) {
-          status = 'On process';
-        }
-      } else {
-        status = 'Delivered';
-      }
-      return status;
-    }
-
-    int daysBetween() {
-      DateTime from = DateTime.parse(item.orderData.deliveryNoteConfirmedDate!);
-      DateTime to = DateTime.now();
-
-      from = DateTime(from.year, from.month, from.day);
-      to = DateTime(to.year, to.month, to.day);
-      return (to.difference(from).inHours / 24).round();
-    }
-
-    _onTap() {
-      if (!item.orderData.delivered) {
-        onTap(item);
-      }
-    }
-
     return Column(
       children: [
         InkWell(
@@ -68,17 +134,18 @@ class OrderItem extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              item.orderData.orderTitle,
+                              widget.item.orderData.orderTitle,
                               style: const TextStyle(
                                   fontSize: 25,
                                   color: Color.fromRGBO(117, 111, 99, 1)),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            Text('Order ID: ${item.orderId}'),
-                            Text('Status: ${_getStatus()}'),
+                            Text('Order ID: ${widget.item.orderId}'),
+                            Text('Status: $_status'),
                             Visibility(
-                                visible: item.orderData.confirmedBySales &&
-                                    item.orderData.approvedByCustomer,
+                                visible: widget
+                                        .item.orderData.confirmedBySales &&
+                                    widget.item.orderData.approvedByCustomer,
                                 child: Row(
                                   children: [
                                     Text('Tracking number: '),
@@ -91,7 +158,8 @@ class OrderItem extends StatelessWidget {
                                     )
                                   ],
                                 )),
-                            item.orderData.deliveryNoteConfirmedDate == null
+                            widget.item.orderData.deliveryNoteConfirmedDate ==
+                                    null
                                 ? Container()
                                 : Text(
                                     'Due payment in ${45 - daysBetween()} days',
@@ -104,7 +172,7 @@ class OrderItem extends StatelessWidget {
                         ),
                       ),
                       Visibility(
-                        visible: item.orderData.delivered,
+                        visible: widget.item.orderData.delivered,
                         child: Flexible(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -114,9 +182,10 @@ class OrderItem extends StatelessWidget {
                                   primary:
                                       const Color.fromRGBO(160, 152, 128, 1),
                                 ),
-                                onPressed: () => Get.toNamed(
-                                    RouteConstant.invoice,
-                                    arguments: item.toMap()),
+                                onPressed: !_deliveryNoteSubmitted
+                                    ? null
+                                    : () => Get.toNamed(RouteConstant.invoice,
+                                        arguments: widget.item.toMap()),
                                 child: const Text('Invoice'),
                               ),
                               OutlinedButton(
@@ -125,16 +194,17 @@ class OrderItem extends StatelessWidget {
                                         const Color.fromRGBO(160, 152, 128, 1)),
                                 onPressed: () => Get.toNamed(
                                     RouteConstant.deliveryNote,
-                                    arguments: item.toMap()),
+                                    arguments: widget.item.toMap()),
                                 child: const Text('Delivery Note'),
                               ),
                               OutlinedButton(
                                 style: OutlinedButton.styleFrom(
                                     primary:
                                         const Color.fromRGBO(160, 152, 128, 1)),
-                                onPressed: () => Get.toNamed(
-                                    RouteConstant.payment,
-                                    arguments: item.toMap()),
+                                onPressed: !_deliveryNoteSubmitted
+                                    ? null
+                                    : () => Get.toNamed(RouteConstant.payment,
+                                        arguments: widget.item.toMap()),
                                 child: const Text('Payment'),
                               )
                             ],
@@ -144,7 +214,7 @@ class OrderItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                Text('Date created: ${item.orderData.orderTime}'),
+                Text('Date created: ${widget.item.orderData.orderTime}'),
               ],
             ),
           ),

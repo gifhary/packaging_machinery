@@ -4,4 +4,5 @@ class DbConstant {
   static const String order = 'order/';
   static const String cancelledOrder = 'cancelled_order/';
   static const String paymentProof = 'payment_proof/';
+  static const String deliveryNote = 'delivery_note/';
 }
