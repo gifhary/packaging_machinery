@@ -144,7 +144,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                     ),
                     Padding(
                       padding: const EdgeInsets.symmetric(vertical: 10),
-                      child: Text('PO Title: hehe'),
+                      child: Text('PO Title: ${_item.orderData.orderTitle}'),
                     ),
                     //section 1
                     Container(
