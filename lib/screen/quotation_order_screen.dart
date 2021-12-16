@@ -58,6 +58,17 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
     });
   }
 
+  _approve() {
+    order.child('${getMd5(_user.email)}/${_item.orderId}').update({
+      'approver': approverController.text,
+      'approvedByCustomer': true,
+      'delivered': true,
+    }).then((value) {
+      debugPrint('approved');
+      Get.back();
+    });
+  }
+
   String getMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
@@ -329,7 +340,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(_user.userDetail!.company ?? ''),
+                                      Text(_user.userDetail!.company ?? '-'),
                                       Text(_getAddress(_user.userDetail!
                                           .invoiceBillingSettlementAddress!)),
                                     ],
@@ -459,8 +470,9 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                           style: ElevatedButton.styleFrom(
                             primary: const Color.fromRGBO(160, 152, 128, 1),
                           ),
-                          onPressed:
-                              _item.orderData.confirmedBySales ? () {} : null,
+                          onPressed: _item.orderData.confirmedBySales
+                              ? _approve
+                              : null,
                           child: const Text('Approve'),
                         ),
                         const SizedBox(width: 30),

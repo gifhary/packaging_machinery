@@ -106,9 +106,7 @@ class _OrderItemState extends State<OrderItem> {
   }
 
   _onTap() {
-    if (!widget.item.orderData.delivered) {
-      widget.onTap(widget.item);
-    }
+    widget.onTap(widget.item);
   }
 
   @override
