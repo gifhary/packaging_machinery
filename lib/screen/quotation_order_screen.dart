@@ -407,32 +407,36 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                           SizedBox(
                             width: 450,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 Text(
                                   'Approver*',
                                   style: TextStyle(fontWeight: FontWeight.bold),
                                 ),
-                                SizedBox(
-                                  width: 300,
-                                  child: TextField(
-                                    controller: approverController,
-                                    decoration: InputDecoration(
-                                      focusedBorder: const OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color:
-                                                Color.fromRGBO(117, 111, 99, 1),
-                                            width: 1),
+                                SizedBox(width: 100),
+                                _item.orderData.approver != null
+                                    ? Text(_item.orderData.approver ?? '')
+                                    : SizedBox(
+                                        width: 250,
+                                        child: TextField(
+                                          controller: approverController,
+                                          decoration: InputDecoration(
+                                            focusedBorder:
+                                                const OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                      117, 111, 99, 1),
+                                                  width: 1),
+                                            ),
+                                            enabledBorder:
+                                                const OutlineInputBorder(
+                                              borderSide: BorderSide(
+                                                  color: Color.fromRGBO(
+                                                      117, 111, 99, 1),
+                                                  width: 1),
+                                            ),
+                                          ),
+                                        ),
                                       ),
-                                      enabledBorder: const OutlineInputBorder(
-                                        borderSide: BorderSide(
-                                            color:
-                                                Color.fromRGBO(117, 111, 99, 1),
-                                            width: 1),
-                                      ),
-                                    ),
-                                  ),
-                                ),
                               ],
                             ),
                           ),
@@ -463,29 +467,33 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                         ],
                       ),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      children: [
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            primary: const Color.fromRGBO(160, 152, 128, 1),
+                    Visibility(
+                      visible: !_item.orderData.approvedByCustomer,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: const Color.fromRGBO(160, 152, 128, 1),
+                            ),
+                            onPressed: _item.orderData.confirmedBySales
+                                ? _approve
+                                : null,
+                            child: const Text('Approve'),
                           ),
-                          onPressed: _item.orderData.confirmedBySales
-                              ? _approve
-                              : null,
-                          child: const Text('Approve'),
-                        ),
-                        const SizedBox(width: 30),
-                        OutlinedButton(
-                          style: OutlinedButton.styleFrom(
-                              primary: const Color.fromRGBO(160, 152, 128, 1)),
-                          onPressed: () {
-                            _cancelOrder(_item.orderId, _item.orderData);
-                            Get.offAllNamed(RouteConstant.home);
-                          },
-                          child: const Text('Cancel Order'),
-                        )
-                      ],
+                          const SizedBox(width: 30),
+                          OutlinedButton(
+                            style: OutlinedButton.styleFrom(
+                                primary:
+                                    const Color.fromRGBO(160, 152, 128, 1)),
+                            onPressed: () {
+                              _cancelOrder(_item.orderId, _item.orderData);
+                              Get.offAllNamed(RouteConstant.home);
+                            },
+                            child: const Text('Cancel Order'),
+                          )
+                        ],
+                      ),
                     ),
                     Visibility(
                       visible: !_item.orderData.confirmedBySales,
