@@ -37,6 +37,8 @@ class OrderData {
                   for (String key
                       in json['machineList'][machineKey]['partRequest'].keys)
                     key: PartData(
+                      availability: json['machineList'][machineKey]
+                          ['partRequest'][key]['availability'],
                       price: json['machineList'][machineKey]['partRequest'][key]
                           ['price'],
                       partNumber: json['machineList'][machineKey]['partRequest']
@@ -66,6 +68,10 @@ class OrderData {
                 for (String partKey
                     in machineList[machineKey]!.partRequest.keys)
                   partKey: {
+                    'availability': machineList[machineKey]!
+                            .partRequest[partKey]!
+                            .availability ??
+                        null,
                     'price':
                         machineList[machineKey]!.partRequest[partKey]!.price ??
                             null,
@@ -97,8 +103,10 @@ class PartData {
   String itemName;
   double? price;
   int quantity;
+  String? availability;
 
   PartData({
+    this.availability,
     required this.partNumber,
     required this.itemName,
     this.price,

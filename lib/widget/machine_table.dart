@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:packaging_machinery/model/order_data.dart';
 
 class MachineTable extends StatelessWidget {
   final MachineData machineData;
 
-  const MachineTable({Key? key, required this.machineData}) : super(key: key);
+  MachineTable({Key? key, required this.machineData}) : super(key: key);
+
+  final cur = NumberFormat("#,##0.00", "en_US");
 
   @override
   Widget build(BuildContext context) {
@@ -81,25 +84,35 @@ class MachineTable extends StatelessWidget {
                     children: [
                       Text(machineData.partRequest[key]!.itemName),
                       SizedBox(
-                        width: 200,
+                        width: 150,
+                        height: 22,
                         child: Text(
-                          '*estimated time of arrival: 20/05/2021',
+                          '*estimated arrival: ' +
+                              (machineData.partRequest[key]!.availability ??
+                                  ''),
                           style: TextStyle(
                               color: Colors.blue,
-                              fontSize: 12,
+                              fontSize: 10,
                               fontStyle: FontStyle.italic,
                               fontWeight: FontWeight.w100,
                               letterSpacing: 0.5),
                         ),
-                      )
+                      ),
                     ],
                   )),
                   DataCell(Text(machineData.partRequest[key]!.partNumber)),
                   DataCell(
                       Text(machineData.partRequest[key]!.quantity.toString())),
                   DataCell(Text('0.00')),
-                  DataCell(Text('')),
-                  DataCell(Text('')),
+                  DataCell(
+                    Text(
+                        cur.format((machineData.partRequest[key]?.price ?? 0))),
+                  ),
+                  DataCell(
+                    Text(cur.format(
+                        ((machineData.partRequest[key]?.price ?? 0) *
+                            machineData.partRequest[key]!.quantity))),
+                  ),
                 ],
               ),
           ]),

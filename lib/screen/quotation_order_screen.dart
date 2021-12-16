@@ -4,6 +4,7 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:packaging_machinery/constant/db_constant.dart';
 import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/item.dart';
@@ -20,19 +21,34 @@ class QuotationOrderScreen extends StatefulWidget {
 }
 
 class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
+  final cur = NumberFormat("#,##0.00", "en_US");
+
   final Item _item = Item.fromMap(Get.arguments);
   final TextEditingController approverController = TextEditingController();
   late User _user;
   final db = FirebaseDatabase.instance.reference();
   late DatabaseReference order;
   late DatabaseReference cancelledOrder;
+  double _total = 0;
 
   @override
   void initState() {
     _getLocalUserData();
     order = db.child(DbConstant.order);
     cancelledOrder = db.child(DbConstant.cancelledOrder);
+
+    if (_item.orderData.confirmedBySales) _calculateTotal();
     super.initState();
+  }
+
+  _calculateTotal() {
+    for (String i in _item.orderData.machineList.keys) {
+      for (String j in _item.orderData.machineList[i]!.partRequest.keys) {
+        _total +=
+            ((_item.orderData.machineList[i]!.partRequest[j]!.price ?? 0) *
+                _item.orderData.machineList[i]!.partRequest[j]!.quantity);
+      }
+    }
   }
 
   _getLocalUserData() {
@@ -136,7 +152,10 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                     Row(
                       children: [
                         Text(
-                          'Quotation ',
+                          _item.orderData.approvedByCustomer &&
+                                  _item.orderData.confirmedBySales
+                              ? 'Purchase '
+                              : 'Quotation ',
                           style: TextStyle(
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
@@ -393,7 +412,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                                 'Total',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
-                              Text('36000000'),
+                              Text(cur.format(_total)),
                             ],
                           ),
                         ),
