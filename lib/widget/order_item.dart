@@ -6,7 +6,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/constant/db_constant.dart';
+import 'package:packaging_machinery/model/delivery_note.dart';
 import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/staff.dart';
 import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
 
@@ -25,13 +27,19 @@ class _OrderItemState extends State<OrderItem> {
   bool _deliveryNoteSubmitted = false;
 
   final db = FirebaseDatabase.instance.reference();
+
   late User _user;
   String _status = '';
+
+  late Staff _director, _salesAdmin, _salesManager;
+
+  late DeliveryNote _note;
 
   @override
   void initState() {
     _getStatus();
     _getLocalUserData();
+    _getStaff();
     WidgetsBinding.instance!
         .addPostFrameCallback((_) => _getDeliveryNoteStatus());
     super.initState();
@@ -44,10 +52,24 @@ class _OrderItemState extends State<OrderItem> {
         .get()
         .then((value) {
       if (value.exists) {
+        _note = DeliveryNote.fromMap(value.value);
         setState(() {
           _deliveryNoteSubmitted = true;
         });
         _getPaymentProofStatus();
+      }
+    });
+  }
+
+  _getStaff() {
+    final staff = db.child(DbConstant.staff);
+    staff.get().then((value) {
+      if (value.exists) {
+        debugPrint('staff: ' + value.value.toString());
+
+        _director = Staff.fromMap(value.value['director']);
+        _salesAdmin = Staff.fromMap(value.value['salesAdmin']);
+        _salesManager = Staff.fromMap(value.value['salesManager']);
       }
     });
   }
@@ -183,7 +205,12 @@ class _OrderItemState extends State<OrderItem> {
                                 onPressed: !_deliveryNoteSubmitted
                                     ? null
                                     : () => Get.toNamed(RouteConstant.invoice,
-                                        arguments: widget.item.toMap()),
+                                            arguments: {
+                                              'item': widget.item.toMap(),
+                                              'director': _director,
+                                              'salesManager': _salesManager,
+                                              'note': _note
+                                            }),
                                 child: const Text('Invoice'),
                               ),
                               OutlinedButton(
@@ -192,7 +219,10 @@ class _OrderItemState extends State<OrderItem> {
                                         const Color.fromRGBO(160, 152, 128, 1)),
                                 onPressed: () => Get.toNamed(
                                     RouteConstant.deliveryNote,
-                                    arguments: widget.item.toMap()),
+                                    arguments: {
+                                      'item': widget.item.toMap(),
+                                      'salesAdmin': _salesAdmin,
+                                    }),
                                 child: const Text('Delivery Note'),
                               ),
                               OutlinedButton(
@@ -202,7 +232,10 @@ class _OrderItemState extends State<OrderItem> {
                                 onPressed: !_deliveryNoteSubmitted
                                     ? null
                                     : () => Get.toNamed(RouteConstant.payment,
-                                        arguments: widget.item.toMap()),
+                                            arguments: {
+                                              'item': widget.item.toMap(),
+                                              'note': _note
+                                            }),
                                 child: const Text('Payment'),
                               )
                             ],

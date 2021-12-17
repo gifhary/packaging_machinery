@@ -5,11 +5,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
+import 'package:intl/intl.dart';
 import 'package:packaging_machinery/model/address.dart';
+import 'package:packaging_machinery/model/delivery_note.dart';
 import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/staff.dart';
 import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
-import 'package:packaging_machinery/widget/machine_table.dart';
 import 'package:packaging_machinery/widget/machine_table_invoice.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:html' as html; //ignore: avoid_web_libraries_in_flutter
@@ -21,14 +23,31 @@ class InvoiceScreen extends StatefulWidget {
 }
 
 class _InvoiceScreenState extends State<InvoiceScreen> {
-  final Item _item = Item.fromMap(Get.arguments);
+  final Item _item = Item.fromMap(Get.arguments['item']);
+  final Staff _salesManager = Get.arguments['salesManager'] as Staff;
+  final Staff _director = Get.arguments['director'] as Staff;
+  final DeliveryNote _note = Get.arguments['note'] as DeliveryNote;
+
   late User _user;
   ScreenshotController screenshotController = ScreenshotController();
+
+  final cur = NumberFormat("#,##0.00", "en_US");
+  double _total = 0;
 
   @override
   void initState() {
     _getLocalUserData();
+    if (_item.orderData.confirmedBySales) _calculateTotal();
     super.initState();
+  }
+
+  _calculateTotal() {
+    for (String i in _item.orderData.machineList.keys) {
+      for (String j in _item.orderData.machineList[i]!.partRequest.keys) {
+        _total += (_item.orderData.machineList[i]!.partRequest[j]!.quantity *
+            (_item.orderData.machineList[i]!.partRequest[j]!.price ?? 0));
+      }
+    }
   }
 
   _getLocalUserData() {
@@ -211,13 +230,13 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(DateTime.now().toString()),
+                                    Text(_note.date),
                                     SizedBox(height: 5),
                                     Text(getMd5(_user.email)),
                                     SizedBox(height: 5),
-                                    Text('21/129'),
+                                    Text(_note.refNo),
                                     SizedBox(height: 5),
-                                    Text('2')
+                                    Text(_note.rnNo)
                                   ],
                                 ),
                               ],
@@ -251,9 +270,9 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('18,000,000'),
+                              Text(cur.format(_total)),
                               SizedBox(height: 10),
-                              Text('1,800,000'),
+                              Text(cur.format(_total * 0.1)),
                             ],
                           )
                         ],
@@ -276,7 +295,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           ),
                           SizedBox(width: 20),
                           Text(
-                            '19,800,000',
+                            cur.format((_total * 0.1) + _total),
                             style: TextStyle(fontWeight: FontWeight.bold),
                           ),
                         ],
@@ -286,17 +305,12 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       Text('Remarks,',
                           style: TextStyle(fontStyle: FontStyle.italic)),
                       SizedBox(height: 100),
-                      Container(
-                        width: 400,
-                        height: 200,
-                        color: Colors.grey,
-                      ),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           SizedBox(
-                            width: 400,
+                            width: 600,
                             child: Column(
                               children: [
                                 Row(
@@ -305,6 +319,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                   children: [
                                     Column(
                                       children: [
+                                        Image.network(
+                                          _director.signature,
+                                          height: 100,
+                                          fit: BoxFit.contain,
+                                        ),
                                         Container(
                                           margin: EdgeInsets.all(15),
                                           width: 150,
@@ -312,7 +331,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           color: Colors.black,
                                         ),
                                         Text(
-                                          'ANTONI WIJAYA',
+                                          _director.name,
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),
@@ -320,6 +339,11 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                     ),
                                     Column(
                                       children: [
+                                        Image.network(
+                                          _salesManager.signature,
+                                          height: 100,
+                                          fit: BoxFit.contain,
+                                        ),
                                         Container(
                                           margin: EdgeInsets.all(15),
                                           width: 150,
@@ -327,7 +351,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                           color: Colors.black,
                                         ),
                                         Text(
-                                          'HENRY KURNIAWAN',
+                                          _salesManager.name,
                                           style: TextStyle(
                                               fontWeight: FontWeight.bold),
                                         ),

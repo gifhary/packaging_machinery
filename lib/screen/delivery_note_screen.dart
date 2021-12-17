@@ -12,8 +12,8 @@ import 'package:packaging_machinery/constant/storage_constant.dart';
 import 'package:packaging_machinery/model/address.dart';
 import 'package:packaging_machinery/model/delivery_note.dart';
 import 'package:packaging_machinery/model/item.dart';
+import 'package:packaging_machinery/model/staff.dart';
 import 'package:packaging_machinery/model/user.dart';
-import 'package:packaging_machinery/widget/machine_table.dart';
 import 'package:packaging_machinery/widget/machine_table_note.dart';
 
 class DeliveryNoteScreen extends StatefulWidget {
@@ -23,7 +23,9 @@ class DeliveryNoteScreen extends StatefulWidget {
 
 class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
   final db = FirebaseDatabase.instance.reference();
-  final Item _item = Item.fromMap(Get.arguments);
+  final Item _item = Item.fromMap(Get.arguments['item']);
+  final Staff _salesAdmin = Get.arguments['salesAdmin'] as Staff;
+
   late User _user;
   Uint8List imageFile = Uint8List(0);
 
@@ -348,11 +350,10 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                         children: [
                           Column(
                             children: [
-                              Container(
-                                height: 200,
-                                width: 300,
-                                child: Image.network(
-                                    'https://firebasestorage.googleapis.com/v0/b/packaging-machinery.appspot.com/o/companyAsset%2Fdelivery-note-stamp.png?alt=media&token=86c60e7b-94b0-46e1-b642-359681cee7e0'),
+                              Image.network(
+                                _salesAdmin.signature,
+                                height: 100,
+                                fit: BoxFit.contain,
                               ),
                               Container(
                                 margin: EdgeInsets.all(15),
@@ -361,7 +362,7 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                                 color: Colors.black,
                               ),
                               Text(
-                                'LEONI ANDRIYATI',
+                                _salesAdmin.name,
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                               SizedBox(height: 10),
@@ -371,9 +372,10 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                           Column(
                             children: [
                               Container(
-                                height: 200,
-                                width: 300,
-                                color: Colors.grey.withOpacity(0.5),
+                                height: 100,
+                                color: _note?.imgUrl.isNotEmpty ?? false
+                                    ? Colors.transparent
+                                    : Colors.grey.withOpacity(0.5),
                                 child: InkWell(
                                   onTap: _note == null
                                       ? _getCustomerSignature
@@ -381,12 +383,12 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                                   child: imageFile.isNotEmpty
                                       ? Image.memory(
                                           imageFile,
-                                          fit: BoxFit.cover,
+                                          fit: BoxFit.contain,
                                         )
                                       : _note?.imgUrl.isNotEmpty ?? false
                                           ? Image.network(
                                               _note!.imgUrl,
-                                              fit: BoxFit.cover,
+                                              fit: BoxFit.contain,
                                             )
                                           : Column(
                                               mainAxisAlignment:

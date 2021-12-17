@@ -8,9 +8,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:image_picker_web/image_picker_web.dart';
+import 'package:intl/intl.dart';
 import 'package:packaging_machinery/constant/db_constant.dart';
 import 'package:packaging_machinery/constant/storage_constant.dart';
 import 'package:packaging_machinery/model/address.dart';
+import 'package:packaging_machinery/model/delivery_note.dart';
 import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/payment_proof.dart';
 import 'package:packaging_machinery/model/user.dart';
@@ -26,7 +28,9 @@ class PaymentScreen extends StatefulWidget {
 class _PaymentScreenState extends State<PaymentScreen> {
   final db = FirebaseDatabase.instance.reference();
 
-  final Item _item = Item.fromMap(Get.arguments);
+  final Item _item = Item.fromMap(Get.arguments['item']);
+  final DeliveryNote _note = Get.arguments['note'] as DeliveryNote;
+
   final TextEditingController _paymentDate = TextEditingController();
 
   Uint8List imageFile = Uint8List(0);
@@ -37,12 +41,25 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   bool _loading = true;
 
+  final cur = NumberFormat("#,##0.00", "en_US");
+  double _total = 0;
+
   @override
   void initState() {
     _getLocalUserData();
+    if (_item.orderData.confirmedBySales) _calculateTotal();
     WidgetsBinding.instance!
         .addPostFrameCallback((_) => _getPaymentProofStatus());
     super.initState();
+  }
+
+  _calculateTotal() {
+    for (String i in _item.orderData.machineList.keys) {
+      for (String j in _item.orderData.machineList[i]!.partRequest.keys) {
+        _total += (_item.orderData.machineList[i]!.partRequest[j]!.quantity *
+            (_item.orderData.machineList[i]!.partRequest[j]!.price ?? 0));
+      }
+    }
   }
 
   _getPaymentProofStatus() {
@@ -239,9 +256,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         children: [
                                           Text(getMd5(_user.email)),
                                           SizedBox(height: 5),
-                                          Text('21/129'),
+                                          Text(_note.refNo),
                                           SizedBox(height: 5),
-                                          Text('2')
+                                          Text(_note.rnNo)
                                         ],
                                       ),
                                     ],
@@ -277,9 +294,9 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                             crossAxisAlignment:
                                                 CrossAxisAlignment.start,
                                             children: [
-                                              Text('18,000,000'),
+                                              Text(cur.format(_total)),
                                               SizedBox(height: 10),
-                                              Text('1,800,000'),
+                                              Text(cur.format(_total * 0.1)),
                                             ],
                                           )
                                         ],
@@ -300,7 +317,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                           ),
                                           SizedBox(width: 20),
                                           Text(
-                                            '19,800,000',
+                                            cur.format((_total * 0.1) + _total),
                                             style: TextStyle(
                                                 fontWeight: FontWeight.bold),
                                           ),
