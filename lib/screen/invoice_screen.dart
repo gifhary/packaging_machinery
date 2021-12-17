@@ -10,6 +10,7 @@ import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
 import 'package:packaging_machinery/widget/machine_table.dart';
+import 'package:packaging_machinery/widget/machine_table_invoice.dart';
 import 'package:screenshot/screenshot.dart';
 import 'dart:html' as html; //ignore: avoid_web_libraries_in_flutter
 import 'dart:js' as js; // ignore: avoid_web_libraries_in_flutter
@@ -226,7 +227,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                       ),
                       SizedBox(height: 20),
                       for (String key in _item.orderData.machineList.keys)
-                        MachineTable(
+                        MachineTableInvoice(
                             machineData: _item.orderData.machineList[key]!),
                       const Divider(color: Color.fromRGBO(160, 152, 128, 1)),
                       Row(
