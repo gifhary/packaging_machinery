@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/constant/db_constant.dart';
+import 'package:packaging_machinery/model/item_list.dart';
 import 'package:packaging_machinery/model/order_data.dart';
 import 'package:packaging_machinery/model/order_request.dart';
 import 'package:packaging_machinery/model/user.dart';
@@ -77,6 +78,7 @@ class _BookNowScreenState extends State<BookNowScreen> {
     return Column(
       children: [
         MachineInputGroup(
+            onSelected: (val, partKey) => _onItemSelected(val, key, partKey),
             mapKey: key,
             machineRequest: machineRequest,
             onAddMorePart: _addPart),
@@ -86,6 +88,16 @@ class _BookNowScreenState extends State<BookNowScreen> {
         ),
       ],
     );
+  }
+
+  _onItemSelected(ItemList list, String machineKey, String partKey) {
+    setState(() {
+      _orderRequest.machineList[machineKey]!.partRequest[partKey]!.itemName
+          .text = list.item;
+      _orderRequest.machineList[machineKey]!.partRequest[partKey]!.partNumber
+          .text = list.partNumber;
+      _orderRequest.machineList[machineKey]!.machineType.text = list.type;
+    });
   }
 
   _migrateReqToData() {

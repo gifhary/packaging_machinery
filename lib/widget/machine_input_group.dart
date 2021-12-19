@@ -1,19 +1,26 @@
 import 'package:flutter/material.dart';
+import 'package:packaging_machinery/model/item_list.dart';
 import 'package:packaging_machinery/model/order_request.dart';
+import 'package:packaging_machinery/utils/item_data.dart';
 
 class MachineInputGroup extends StatelessWidget {
   final String mapKey;
   final MachineRequest machineRequest;
   final Function(String)? onAddMorePart;
+  final Function(ItemList, String)? onSelected;
 
-  const MachineInputGroup(
+  MachineInputGroup(
       {Key? key,
       required this.machineRequest,
       this.onAddMorePart,
-      required this.mapKey})
+      required this.mapKey,
+      this.onSelected})
       : super(key: key);
 
-  Widget _machinePartWidget(PartRequest partRequest) {
+  final List<ItemList> _list =
+      ItemData.itemList.map((e) => ItemList.fromMap(e)).toList();
+
+  Widget _machinePartWidget(PartRequest partRequest, String key) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -23,21 +30,35 @@ class MachineInputGroup extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 9),
-                child: Text('Parts Number:'),
+                child: Text('Item:'),
               ),
-              TextField(
-                controller: partRequest.partNumber,
-                decoration: const InputDecoration(
-                  focusedBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color.fromRGBO(117, 111, 99, 1), width: 1),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderSide: BorderSide(
-                        color: Color.fromRGBO(117, 111, 99, 1), width: 1),
-                  ),
-                  hintText: 'Enter spare part number',
-                ),
+              Autocomplete<ItemList>(
+                fieldViewBuilder: (context, fieldTextEditingController,
+                    fieldFocusNode, onFieldSubmitted) {
+                  return TextField(
+                    controller: fieldTextEditingController,
+                    focusNode: fieldFocusNode,
+                    decoration: const InputDecoration(
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromRGBO(117, 111, 99, 1), width: 1),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(
+                            color: Color.fromRGBO(117, 111, 99, 1), width: 1),
+                      ),
+                      hintText: 'Enter spare part name',
+                    ),
+                  );
+                },
+                displayStringForOption: (option) => option.item,
+                onSelected: (val) => onSelected!(val, key),
+                optionsBuilder: (val) {
+                  if (val.text == '') return const Iterable<ItemList>.empty();
+                  return _list.where((element) => element.item
+                      .toLowerCase()
+                      .startsWith(val.text.toLowerCase()));
+                },
               ),
             ],
           ),
@@ -49,10 +70,11 @@ class MachineInputGroup extends StatelessWidget {
             children: [
               const Padding(
                 padding: EdgeInsets.symmetric(vertical: 9),
-                child: Text('Item:'),
+                child: Text('Parts Number:'),
               ),
               TextField(
-                controller: partRequest.itemName,
+                readOnly: true,
+                controller: partRequest.partNumber,
                 decoration: const InputDecoration(
                   focusedBorder: OutlineInputBorder(
                     borderSide: BorderSide(
@@ -62,7 +84,7 @@ class MachineInputGroup extends StatelessWidget {
                     borderSide: BorderSide(
                         color: Color.fromRGBO(117, 111, 99, 1), width: 1),
                   ),
-                  hintText: 'Enter spare part name',
+                  hintText: 'Enter spare part number',
                 ),
               ),
             ],
@@ -109,6 +131,7 @@ class MachineInputGroup extends StatelessWidget {
             const Text('Machine Type: '),
             Flexible(
               child: TextField(
+                readOnly: true,
                 controller: machineRequest.machineType,
                 decoration: const InputDecoration(
                   focusedBorder: OutlineInputBorder(
@@ -127,7 +150,7 @@ class MachineInputGroup extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         for (String key in machineRequest.partRequest.keys)
-          _machinePartWidget(machineRequest.partRequest[key]!),
+          _machinePartWidget(machineRequest.partRequest[key]!, key),
         Padding(
           padding: const EdgeInsets.symmetric(vertical: 20),
           child: InkWell(
