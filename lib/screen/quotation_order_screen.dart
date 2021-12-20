@@ -269,9 +269,10 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                                       ? _item.orderData.deliveryDate ?? ''
                                       : '(waiting for confirmation)',
                                   style: TextStyle(
-                                      color: _item.orderData.confirmedBySales
-                                          ? Colors.black
-                                          : Colors.grey),
+                                      color:
+                                          _item.orderData.deliveryDate != null
+                                              ? Colors.black
+                                              : Colors.grey),
                                 ),
                               )
                             ]),
