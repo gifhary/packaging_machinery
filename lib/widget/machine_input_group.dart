@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:packaging_machinery/model/item_list.dart';
 import 'package:packaging_machinery/model/order_request.dart';
 import 'package:packaging_machinery/utils/item_data.dart';
@@ -101,6 +102,9 @@ class MachineInputGroup extends StatelessWidget {
                 child: Text('Quantity:'),
               ),
               TextField(
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'[0-9]'))
+                ],
                 controller: partRequest.quantity,
                 decoration: const InputDecoration(
                   focusedBorder: OutlineInputBorder(

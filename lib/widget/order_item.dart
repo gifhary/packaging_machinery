@@ -104,7 +104,7 @@ class _OrderItemState extends State<OrderItem> {
     if (!widget.item.orderData.delivered) {
       if (widget.item.orderData.confirmedBySales &&
           widget.item.orderData.approvedByCustomer) {
-        _status = 'On delivery';
+        _status = 'Waiting for delivery';
       } else if (widget.item.orderData.confirmedBySales &&
           !widget.item.orderData.approvedByCustomer) {
         _status = 'Waiting for approval';
@@ -163,9 +163,8 @@ class _OrderItemState extends State<OrderItem> {
                             Text('Order ID: ${widget.item.orderId}'),
                             Text('Status: $_status'),
                             Visibility(
-                                visible: widget
-                                        .item.orderData.confirmedBySales &&
-                                    widget.item.orderData.approvedByCustomer,
+                                visible: widget.item.orderData.trackingNumber !=
+                                    null,
                                 child: Row(
                                   children: [
                                     Text('Tracking number: '),
@@ -174,7 +173,9 @@ class _OrderItemState extends State<OrderItem> {
                                           border: Border.all(
                                               color: const Color.fromRGBO(
                                                   222, 222, 222, 1))),
-                                      child: Text('109822873778'),
+                                      child: Text(widget
+                                              .item.orderData.trackingNumber ??
+                                          ''),
                                     )
                                   ],
                                 )),

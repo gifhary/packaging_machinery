@@ -130,6 +130,26 @@ class _BookNowScreenState extends State<BookNowScreen> {
     );
   }
 
+  bool _completed() {
+    bool complete = true;
+
+    if (_orderRequest.orderTitle.text.isEmpty) complete = false;
+    for (String machineKey in _orderRequest.machineList.keys) {
+      if (_orderRequest.machineList[machineKey]!.machineType.text.isEmpty)
+        complete = false;
+      for (String partKey
+          in _orderRequest.machineList[machineKey]!.partRequest.keys) {
+        if (_orderRequest.machineList[machineKey]!.partRequest[partKey]!
+            .itemName.text.isEmpty) complete = false;
+        if (_orderRequest.machineList[machineKey]!.partRequest[partKey]!
+            .partNumber.text.isEmpty) complete = false;
+        if (_orderRequest.machineList[machineKey]!.partRequest[partKey]!
+            .quantity.text.isEmpty) complete = false;
+      }
+    }
+    return complete;
+  }
+
   String getMd5(String input) {
     return md5.convert(utf8.encode(input)).toString();
   }
@@ -140,6 +160,8 @@ class _BookNowScreenState extends State<BookNowScreen> {
     double _width = MediaQuery.of(context).size.width;
 
     _bookNow() {
+      if (!_completed()) return;
+
       GetStorage box = GetStorage();
       var data = box.read('user');
       User _user = User.fromJson(data);

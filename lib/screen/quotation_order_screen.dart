@@ -78,7 +78,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
     order.child('${getMd5(_user.email)}/${_item.orderId}').update({
       'approver': approverController.text,
       'approvedByCustomer': true,
-      'delivered': true,
+      'dateCustomerApprove': DateFormat('dd-MM-yyyy').format(DateTime.now()),
     }).then((value) {
       debugPrint('approved');
       Get.back();
@@ -265,8 +265,8 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
                                 child: Text(
-                                  _item.orderData.confirmedBySales
-                                      ? DateTime.now().toString().split(' ')[0]
+                                  _item.orderData.deliveryDate != null
+                                      ? _item.orderData.deliveryDate ?? ''
                                       : '(waiting for confirmation)',
                                   style: TextStyle(
                                       color: _item.orderData.confirmedBySales
@@ -425,37 +425,58 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                         children: [
                           SizedBox(
                             width: 450,
-                            child: Row(
+                            child: Column(
                               children: [
-                                Text(
-                                  'Approver*',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                SizedBox(width: 100),
-                                _item.orderData.approver != null
-                                    ? Text(_item.orderData.approver ?? '')
-                                    : SizedBox(
-                                        width: 250,
-                                        child: TextField(
-                                          controller: approverController,
-                                          decoration: InputDecoration(
-                                            focusedBorder:
-                                                const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Color.fromRGBO(
-                                                      117, 111, 99, 1),
-                                                  width: 1),
-                                            ),
-                                            enabledBorder:
-                                                const OutlineInputBorder(
-                                              borderSide: BorderSide(
-                                                  color: Color.fromRGBO(
-                                                      117, 111, 99, 1),
-                                                  width: 1),
+                                Row(
+                                  children: [
+                                    Text(
+                                      'Approver*',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                    SizedBox(width: 100),
+                                    _item.orderData.approver != null
+                                        ? Text(_item.orderData.approver ?? '')
+                                        : SizedBox(
+                                            width: 250,
+                                            child: TextField(
+                                              controller: approverController,
+                                              decoration: InputDecoration(
+                                                focusedBorder:
+                                                    const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Color.fromRGBO(
+                                                          117, 111, 99, 1),
+                                                      width: 1),
+                                                ),
+                                                enabledBorder:
+                                                    const OutlineInputBorder(
+                                                  borderSide: BorderSide(
+                                                      color: Color.fromRGBO(
+                                                          117, 111, 99, 1),
+                                                      width: 1),
+                                                ),
+                                              ),
                                             ),
                                           ),
-                                        ),
+                                  ],
+                                ),
+                                Visibility(
+                                  visible: _item.orderData.approvedByCustomer,
+                                  child: Row(
+                                    children: [
+                                      Text(
+                                        'Date of Approval',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold),
                                       ),
+                                      SizedBox(width: 60),
+                                      Text(
+                                          _item.orderData.dateCustomerApprove ??
+                                              '')
+                                    ],
+                                  ),
+                                ),
                               ],
                             ),
                           ),
