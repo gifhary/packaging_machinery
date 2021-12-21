@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
@@ -319,10 +320,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                   children: [
                                     Column(
                                       children: [
-                                        Image.network(
-                                          _director.signature,
+                                        CachedNetworkImage(
                                           height: 100,
                                           fit: BoxFit.contain,
+                                          imageUrl: _director.signature,
+                                          placeholder: (context, url) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
                                         ),
                                         Container(
                                           margin: EdgeInsets.all(15),
@@ -339,10 +345,15 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                     ),
                                     Column(
                                       children: [
-                                        Image.network(
-                                          _salesManager.signature,
+                                        CachedNetworkImage(
                                           height: 100,
                                           fit: BoxFit.contain,
+                                          imageUrl: _salesManager.signature,
+                                          placeholder: (context, url) => Center(
+                                              child:
+                                                  CircularProgressIndicator()),
+                                          errorWidget: (context, url, error) =>
+                                              Icon(Icons.error),
                                         ),
                                         Container(
                                           margin: EdgeInsets.all(15),
@@ -406,7 +417,10 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                           children: [
                             InkWell(
                               onTap: () => Get.toNamed(RouteConstant.payment,
-                                  arguments: _item.toMap()),
+                                  arguments: {
+                                    'item': _item.toMap(),
+                                    'note': _note
+                                  }),
                               child: Text(
                                 'Upload Payment Proof',
                                 style: TextStyle(

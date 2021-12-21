@@ -80,22 +80,27 @@ class MachineTable extends StatelessWidget {
               DataRow(
                 cells: <DataCell>[
                   DataCell(Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(machineData.partRequest[key]!.itemName),
-                      SizedBox(
-                        width: 150,
-                        height: 22,
-                        child: Text(
-                          '*estimated arrival: ' +
-                              (machineData.partRequest[key]!.availability ??
-                                  ''),
-                          style: TextStyle(
-                              color: Colors.blue,
-                              fontSize: 10,
-                              fontStyle: FontStyle.italic,
-                              fontWeight: FontWeight.w100,
-                              letterSpacing: 0.5),
+                      Visibility(
+                        visible:
+                            machineData.partRequest[key]!.availability != null,
+                        child: SizedBox(
+                          width: 150,
+                          height: 22,
+                          child: Text(
+                            '*estimated arrival: ' +
+                                (machineData.partRequest[key]!.availability ??
+                                    ''),
+                            style: TextStyle(
+                                color: Colors.blue,
+                                fontSize: 10,
+                                fontStyle: FontStyle.italic,
+                                fontWeight: FontWeight.w100,
+                                letterSpacing: 0.5),
+                          ),
                         ),
                       ),
                     ],

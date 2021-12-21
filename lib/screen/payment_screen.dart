@@ -223,8 +223,8 @@ class _PaymentScreenState extends State<PaymentScreen> {
                               Text(_user.userDetail!.company ?? ''),
                               SizedBox(
                                   width: 250,
-                                  child: Text(_getAddress(
-                                      _user.userDetail!.deliveryAddress))),
+                                  child: Text(
+                                      _getAddress(_user.userDetail!.address))),
                               Divider(color: Color.fromRGBO(160, 152, 128, 1)),
                               Row(
                                 mainAxisAlignment:

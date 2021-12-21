@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -350,10 +351,14 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                         children: [
                           Column(
                             children: [
-                              Image.network(
-                                _salesAdmin.signature,
-                                height: 100,
+                              CachedNetworkImage(
                                 fit: BoxFit.contain,
+                                imageUrl: _salesAdmin.signature,
+                                height: 100,
+                                placeholder: (context, url) =>
+                                    Center(child: CircularProgressIndicator()),
+                                errorWidget: (context, url, error) =>
+                                    Icon(Icons.error),
                               ),
                               Container(
                                 margin: EdgeInsets.all(15),
@@ -386,9 +391,15 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                                           fit: BoxFit.contain,
                                         )
                                       : _note?.imgUrl.isNotEmpty ?? false
-                                          ? Image.network(
-                                              _note!.imgUrl,
+                                          ? CachedNetworkImage(
                                               fit: BoxFit.contain,
+                                              imageUrl: _note!.imgUrl,
+                                              placeholder: (context, url) => Center(
+                                                  child:
+                                                      CircularProgressIndicator()),
+                                              errorWidget:
+                                                  (context, url, error) =>
+                                                      Icon(Icons.error),
                                             )
                                           : Column(
                                               mainAxisAlignment:
