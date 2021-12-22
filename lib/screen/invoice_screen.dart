@@ -144,7 +144,7 @@ class _InvoiceScreenState extends State<InvoiceScreen> {
                                 fontSize: 30, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            'Order: ${_item.orderId}',
+                            'Order: IN${_item.orderId}',
                             style: TextStyle(fontSize: 30),
                           ),
                         ],

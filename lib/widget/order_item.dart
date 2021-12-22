@@ -160,7 +160,12 @@ class _OrderItemState extends State<OrderItem> {
                                   color: Color.fromRGBO(117, 111, 99, 1)),
                               overflow: TextOverflow.ellipsis,
                             ),
-                            Text('Order ID: ${widget.item.orderId}'),
+                            Text(
+                              widget.item.orderData.approvedByCustomer &&
+                                      widget.item.orderData.confirmedBySales
+                                  ? 'Order: KHS${widget.item.orderId}'
+                                  : 'Order: QO${widget.item.orderId}',
+                            ),
                             Text('Status: $_status'),
                             Visibility(
                                 visible: widget.item.orderData.trackingNumber !=

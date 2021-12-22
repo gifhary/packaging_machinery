@@ -182,7 +182,7 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                                 fontSize: 30, fontWeight: FontWeight.bold),
                           ),
                           Text(
-                            'Order: ${_item.orderId}',
+                            'Order: DN${_item.orderId}',
                             style: TextStyle(fontSize: 30),
                           ),
                         ],

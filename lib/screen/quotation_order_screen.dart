@@ -160,7 +160,10 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               fontSize: 30, fontWeight: FontWeight.bold),
                         ),
                         Text(
-                          'Order: ${_item.orderId} ',
+                          _item.orderData.confirmedBySales &&
+                                  _item.orderData.approvedByCustomer
+                              ? 'Order: KHS${_item.orderId} '
+                              : 'Order: QO${_item.orderId} ',
                           style: TextStyle(fontSize: 30),
                         ),
                         !_item.orderData.confirmedBySales

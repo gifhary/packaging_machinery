@@ -214,7 +214,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
                                         fontWeight: FontWeight.bold),
                                   ),
                                   Text(
-                                    'Order: ${_item.orderId}',
+                                    'Order: PP${_item.orderId}',
                                     style: TextStyle(fontSize: 30),
                                   ),
                                 ],

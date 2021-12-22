@@ -37,7 +37,7 @@ class MachineTable extends StatelessWidget {
               ],
             ),
           ),
-          DataTable(columns: [
+          DataTable(dataRowHeight: 75, columns: [
             DataColumn(
               label: Text(
                 'Item',
@@ -58,7 +58,7 @@ class MachineTable extends StatelessWidget {
             ),
             DataColumn(
               label: Text(
-                'Contract Discount %',
+                'Contract\nDiscount %',
                 style: TextStyle(fontWeight: FontWeight.bold),
               ),
             ),
@@ -108,10 +108,13 @@ class MachineTable extends StatelessWidget {
                   DataCell(Text(machineData.partRequest[key]!.partNumber)),
                   DataCell(
                       Text(machineData.partRequest[key]!.quantity.toString())),
-                  DataCell(Text('0.00')),
+                  DataCell(SizedBox(width: 70, child: Text('0.00'))),
                   DataCell(
-                    Text(
-                        cur.format((machineData.partRequest[key]?.price ?? 0))),
+                    SizedBox(
+                      width: 140,
+                      child: Text(cur
+                          .format((machineData.partRequest[key]?.price ?? 0))),
+                    ),
                   ),
                   DataCell(
                     Text(cur.format(
