@@ -97,7 +97,6 @@ class _OrderNowScreenState extends State<OrderNowScreen> {
           .text = list.item;
       _orderRequest.machineList[machineKey]!.partRequest[partKey]!.partNumber
           .text = list.partNumber;
-      _orderRequest.machineList[machineKey]!.machineType.text = list.type;
     });
   }
 

@@ -85,7 +85,7 @@ class MachineInputGroup extends StatelessWidget {
                     borderSide: BorderSide(
                         color: Color.fromRGBO(117, 111, 99, 1), width: 1),
                   ),
-                  hintText: 'Enter spare part number',
+                  hintText: 'Spare part number',
                 ),
               ),
             ],
@@ -135,7 +135,6 @@ class MachineInputGroup extends StatelessWidget {
             const Text('Machine Type: '),
             Flexible(
               child: TextField(
-                readOnly: true,
                 controller: machineRequest.machineType,
                 decoration: const InputDecoration(
                   focusedBorder: OutlineInputBorder(
