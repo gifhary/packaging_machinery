@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/model/user.dart';
@@ -103,7 +104,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         if (_user == null) {
                           Get.toNamed(RouteConstant.login);
                         } else {
-                          Get.offNamed(RouteConstant.bookOnline);
+                          if (_user?.userDetail?.company == null) {
+                            Get.offNamed(RouteConstant.profile, arguments: 2);
+                            Fluttertoast.showToast(
+                                msg: "Complete your personal data first!",
+                                toastLength: Toast.LENGTH_LONG,
+                                gravity: ToastGravity.CENTER,
+                                timeInSecForIosWeb: 3,
+                                backgroundColor: Colors.grey,
+                                textColor: Colors.white,
+                                fontSize: 16.0);
+                          } else {
+                            Get.offNamed(RouteConstant.bookOnline);
+                          }
                         }
                       },
                       child: const Text(

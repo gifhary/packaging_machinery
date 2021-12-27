@@ -109,8 +109,9 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
     TaskSnapshot uploadTask = await storage.putData(
         imageFile, SettableMetadata(contentType: 'image/png'));
 
-    uploadTask.ref.getDownloadURL().then((url) =>
-        _saveDeliveryNote(url, DateTime.now().toString().split(' ')[0]));
+    uploadTask.ref
+        .getDownloadURL()
+        .then((url) => _saveDeliveryNote(url, DateTime.now().toString()));
   }
 
   _saveDeliveryNote(String imgUrl, date) {
