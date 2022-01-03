@@ -12,9 +12,11 @@ class OrderData {
   String? dateCustomerApprove;
   String? trackingNumber;
   String? deliveryDate;
+  String? trackingUrl;
 
   OrderData(
-      {this.approver,
+      {this.trackingUrl,
+      this.approver,
       required this.orderTitle,
       required this.approvedByCustomer,
       required this.confirmedBySales,
@@ -27,6 +29,7 @@ class OrderData {
       this.deliveryDate});
 
   factory OrderData.fromMap(Map<String, dynamic> json) => OrderData(
+          trackingUrl: json['trackingUrl'],
           deliveryDate: json['deliveryDate'],
           trackingNumber: json['trackingNumber'],
           dateCustomerApprove: json['dateCustomerApprove'],
@@ -61,6 +64,7 @@ class OrderData {
           });
 
   Map<String, dynamic> toMap() => {
+        'trackingUrl': trackingUrl,
         'deliveryDate': deliveryDate,
         'trackingNumber': trackingNumber,
         'dateCustomerApprove': dateCustomerApprove,

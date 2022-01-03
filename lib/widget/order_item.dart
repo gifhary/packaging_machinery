@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:packaging_machinery/constant/db_constant.dart';
@@ -11,6 +12,7 @@ import 'package:packaging_machinery/model/item.dart';
 import 'package:packaging_machinery/model/staff.dart';
 import 'package:packaging_machinery/model/user.dart';
 import 'package:packaging_machinery/route/route_constant.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class OrderItem extends StatefulWidget {
   final Item item;
@@ -181,6 +183,38 @@ class _OrderItemState extends State<OrderItem> {
                                       child: Text(widget
                                               .item.orderData.trackingNumber ??
                                           ''),
+                                    )
+                                  ],
+                                )),
+                            Visibility(
+                                visible:
+                                    widget.item.orderData.trackingUrl != null,
+                                child: Row(
+                                  children: [
+                                    Text('Tracking website: '),
+                                    InkWell(
+                                      onTap: () async {
+                                        if (!await launch(
+                                            widget.item.orderData.trackingUrl ??
+                                                '')) {
+                                          Fluttertoast.showToast(
+                                              msg:
+                                                  "Error: could not launch ${widget.item.orderData.trackingUrl}",
+                                              toastLength: Toast.LENGTH_LONG,
+                                              gravity: ToastGravity.CENTER,
+                                              timeInSecForIosWeb: 3,
+                                              backgroundColor: Colors.grey,
+                                              textColor: Colors.white,
+                                              fontSize: 16.0);
+                                        }
+                                      },
+                                      child: Text(
+                                        widget.item.orderData.trackingUrl ?? '',
+                                        style: TextStyle(
+                                            color: Colors.blue,
+                                            decoration:
+                                                TextDecoration.underline),
+                                      ),
                                     )
                                   ],
                                 )),
