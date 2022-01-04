@@ -78,7 +78,7 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
     order.child('${getMd5(_user.email)}/${_item.orderId}').update({
       'approver': approverController.text,
       'approvedByCustomer': true,
-      'dateCustomerApprove': DateFormat('dd-MM-yyyy').format(DateTime.now()),
+      'dateCustomerApprove': DateTime.now().toString(),
     }).then((value) {
       debugPrint('approved');
       Get.back();
