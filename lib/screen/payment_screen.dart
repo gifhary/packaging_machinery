@@ -105,7 +105,7 @@ class _PaymentScreenState extends State<PaymentScreen> {
 
   _savePaymentProof(String imgUrl, date) {
     final paymentProof = db.child(DbConstant.paymentProof);
-    paymentProof.child(getMd5(_user.email)).set({
+    paymentProof.child(getMd5(_user.email)).update({
       _item.orderId: PaymentProof(imgUrl: imgUrl, paymentDate: date).toMap()
     }).then((value) {
       Get.defaultDialog(

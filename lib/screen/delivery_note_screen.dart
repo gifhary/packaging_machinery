@@ -116,7 +116,7 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
 
   _saveDeliveryNote(String imgUrl, date) {
     final deliveryNote = db.child(DbConstant.deliveryNote);
-    deliveryNote.child(getMd5(_user.email)).set({
+    deliveryNote.child(getMd5(_user.email)).update({
       _item.orderId: DeliveryNote(
         date: date,
         imgUrl: imgUrl,
