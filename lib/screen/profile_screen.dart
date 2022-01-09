@@ -59,6 +59,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (value.exists) {
         value.value.forEach((key, val) => _bookingItem
             .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
+        _bookingItem = _bookingItem.reversed.toList();
         setState(() {});
       }
     });
@@ -69,6 +70,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       if (value.exists) {
         value.value.forEach((key, val) => _orderItem
             .add(Item(orderId: key, orderData: OrderData.fromMap(val))));
+        _orderItem = _orderItem.reversed.toList();
         setState(() {});
       }
     });
@@ -89,9 +91,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   _deleteBooking(String bookingId) {
     booking.child('${getMd5(_user.email)}/$bookingId').remove().then((value) {
       setState(() {
-        _orderItem.add(_bookingItem
-            .where((element) => element.orderId == bookingId)
-            .first);
+        _orderItem.insert(
+            0,
+            _bookingItem
+                .where((element) => element.orderId == bookingId)
+                .first);
         _bookingItem.removeWhere((element) => element.orderId == bookingId);
       });
     });
