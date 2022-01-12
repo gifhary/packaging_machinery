@@ -254,6 +254,18 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                             TableRow(children: [
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
+                                child: Text('Email',
+                                    style:
+                                        TextStyle(fontWeight: FontWeight.bold)),
+                              ),
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(_user.email),
+                              )
+                            ]),
+                            TableRow(children: [
+                              Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
                                 child: Text('Order Date',
                                     style:
                                         TextStyle(fontWeight: FontWeight.bold)),
