@@ -2,7 +2,6 @@ import 'dart:convert';
 
 import 'package:crypto/crypto.dart';
 import 'package:firebase_database/firebase_database.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -24,9 +23,6 @@ class _MyAccountTabState extends State<MyAccountTab> {
   final db = FirebaseDatabase.instance.reference();
   late DatabaseReference usersDb;
   late User _user;
-
-  final TextEditingController _nameCtr = TextEditingController();
-  final TextEditingController _titleCtr = TextEditingController();
 
   final TextEditingController _firstNameCtr = TextEditingController();
   final TextEditingController _lastNameCtr = TextEditingController();
@@ -62,6 +58,10 @@ class _MyAccountTabState extends State<MyAccountTab> {
   final TextEditingController _settlementCityCtr = TextEditingController();
   final TextEditingController _settlementZipCodeCtr = TextEditingController();
   final TextEditingController _settlementCountryCtr = TextEditingController();
+
+  final TextEditingController _currentPass = TextEditingController();
+  final TextEditingController _newPass = TextEditingController();
+  final TextEditingController _confirmNewPass = TextEditingController();
 
   @override
   initState() {
@@ -112,6 +112,61 @@ class _MyAccountTabState extends State<MyAccountTab> {
     _postUserDetail();
   }
 
+  _changePassword() {
+    if (_currentPass.text.isEmpty) return;
+    if (_newPass.text.isEmpty) return;
+    if (_confirmNewPass.text.isEmpty) return;
+
+    if (_newPass.text != _confirmNewPass.text) {
+      Get.defaultDialog(
+          titleStyle: const TextStyle(color: Color.fromRGBO(117, 111, 99, 1)),
+          title: "Incorrect",
+          middleText: "Password does not match!",
+          onConfirm: Get.back,
+          buttonColor: const Color.fromRGBO(117, 111, 99, 1),
+          confirmTextColor: Colors.white,
+          textConfirm: 'OK');
+      return;
+    }
+
+    if (_user.password != getMd5(_currentPass.text)) {
+      Get.defaultDialog(
+          titleStyle: const TextStyle(color: Color.fromRGBO(117, 111, 99, 1)),
+          title: "Incorrect",
+          middleText: "Wrong current password",
+          onConfirm: Get.back,
+          buttonColor: const Color.fromRGBO(117, 111, 99, 1),
+          confirmTextColor: Colors.white,
+          textConfirm: 'OK');
+      return;
+    }
+
+    usersDb.child(getMd5(_user.email)).update({
+      'password': getMd5(_newPass.text),
+    }).then((_) {
+      _user.password = getMd5(_newPass.text);
+      _writeToLocal();
+
+      setState(() {
+        _currentPass.text = '';
+        _newPass.text = '';
+        _confirmNewPass.text = '';
+      });
+
+      //show dialog
+      Get.defaultDialog(
+          titleStyle: const TextStyle(color: Color.fromRGBO(117, 111, 99, 1)),
+          title: "Success",
+          middleText: "Your password has been updated!",
+          onConfirm: Get.back,
+          buttonColor: const Color.fromRGBO(117, 111, 99, 1),
+          confirmTextColor: Colors.white,
+          textConfirm: 'OK');
+    }).onError((error, stackTrace) {
+      debugPrint('error updating userDetail');
+    });
+  }
+
   _postUserDetail() {
     usersDb.child(getMd5(_user.email)).update({
       'userDetail': _user.userDetail!.toMap(),
@@ -135,9 +190,7 @@ class _MyAccountTabState extends State<MyAccountTab> {
 
   _fillUpUserModelWithInput() {
     _user.userDetail = UserDetail(
-        name: _nameCtr.text,
-        title: _titleCtr.text.isEmpty ? null : _titleCtr.text,
-        firstName: _firstNameCtr.text.isEmpty ? null : _firstNameCtr.text,
+        firstName: _firstNameCtr.text,
         lastName: _lastNameCtr.text.isEmpty ? null : _lastNameCtr.text,
         phone: _phoneCtr.text.isEmpty ? null : _phoneCtr.text,
         additionalEmail:
@@ -187,13 +240,10 @@ class _MyAccountTabState extends State<MyAccountTab> {
 
   _fillFormWithExistingData() {
     setState(() {
-      _nameCtr.text = _user.userDetail!.name;
-      _titleCtr.text = _user.userDetail!.title ?? '';
-
-      _firstNameCtr.text = _user.userDetail!.firstName ?? '';
+      _firstNameCtr.text = _user.userDetail!.firstName;
       _lastNameCtr.text = _user.userDetail!.lastName ?? '';
       _phoneCtr.text = _user.userDetail!.phone ?? '';
-      _additionalEmailCtr.text = _user.userDetail!.additionalEmail ?? '';
+      _additionalEmailCtr.text = _user.email;
       _companyCtr.text = _user.userDetail!.company ?? '';
       _positionCtr.text = _user.userDetail!.position ?? '';
 
@@ -244,6 +294,7 @@ class _MyAccountTabState extends State<MyAccountTab> {
         child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -280,30 +331,46 @@ class _MyAccountTabState extends State<MyAccountTab> {
               const Padding(
                 padding: EdgeInsets.only(bottom: 15),
                 child: Text(
-                  'Display Info',
+                  'Password',
                   style: TextStyle(fontSize: 25),
                 ),
               ),
-              const Text('View and edit your personal info below.'),
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 15),
-                child: Row(
-                  children: [
-                    IniTextField(
-                      controller: _nameCtr,
-                      label: 'Buyer Name*',
-                    ),
-                    const SizedBox(width: 50),
-                    IniTextField(
-                      controller: _titleCtr,
-                      label: 'Title',
-                    ),
-                  ],
-                ),
+              Row(
+                children: [
+                  IniTextField(
+                    obscure: true,
+                    controller: _currentPass,
+                    label: 'Current Password',
+                  ),
+                  const SizedBox(width: 50),
+                  Flexible(child: Container()),
+                ],
               ),
-              const Divider(color: Color.fromRGBO(117, 111, 99, 1)),
+              Row(
+                children: [
+                  IniTextField(
+                    obscure: true,
+                    controller: _newPass,
+                    label: 'New Password',
+                  ),
+                  const SizedBox(width: 50),
+                  IniTextField(
+                    obscure: true,
+                    controller: _confirmNewPass,
+                    label: 'Confirm New Password',
+                  ),
+                ],
+              ),
+              SizedBox(height: 10),
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: const Color.fromRGBO(160, 152, 128, 1),
+                ),
+                onPressed: _changePassword,
+                child: const Text('Update password'),
+              ),
               const Padding(
-                padding: EdgeInsets.only(bottom: 15),
+                padding: EdgeInsets.symmetric(vertical: 15),
                 child: Text(
                   'Account',
                   style: TextStyle(fontSize: 25),
@@ -311,13 +378,6 @@ class _MyAccountTabState extends State<MyAccountTab> {
               ),
               const Text(
                   'Update & Edit the information you share with the comunity'),
-              const SizedBox(height: 20),
-              const Text('Login Email:'),
-              const Text('luisa.samantha@gmail.com'),
-              const Text(
-                'Your Login email can\'t be changed',
-                style: TextStyle(color: Color.fromRGBO(117, 111, 99, 0.5)),
-              ),
               const SizedBox(height: 20),
               Row(
                 children: [
@@ -341,6 +401,7 @@ class _MyAccountTabState extends State<MyAccountTab> {
                   ),
                   const SizedBox(width: 50),
                   IniTextField(
+                    readOnly: true,
                     controller: _additionalEmailCtr,
                     label: 'Email',
                   ),

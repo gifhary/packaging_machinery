@@ -159,7 +159,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    _user.userDetail?.name ?? '',
+                                    (_user.userDetail?.firstName ?? '') +
+                                        ' ' +
+                                        (_user.userDetail?.lastName ?? ''),
                                     style: TextStyle(
                                       fontSize: 30,
                                       color: Colors.white,

@@ -4,7 +4,16 @@ class IniTextField extends StatelessWidget {
   final String? label;
   final TextEditingController? controller;
   final String? hintText;
-  const IniTextField({Key? key, this.label, this.controller, this.hintText})
+  final bool readOnly;
+  final bool obscure;
+
+  const IniTextField(
+      {Key? key,
+      this.label,
+      this.controller,
+      this.hintText,
+      this.readOnly = false,
+      this.obscure = false})
       : super(key: key);
 
   @override
@@ -18,6 +27,8 @@ class IniTextField extends StatelessWidget {
             child: Text(label ?? ""),
           ),
           TextField(
+            obscureText: obscure,
+            readOnly: readOnly,
             controller: controller,
             decoration: InputDecoration(
               focusedBorder: const OutlineInputBorder(

@@ -423,7 +423,9 @@ class _DeliveryNoteScreenState extends State<DeliveryNoteScreen> {
                                 color: Colors.black,
                               ),
                               Text(
-                                _user.userDetail?.name ?? '',
+                                (_user.userDetail?.firstName ?? '') +
+                                    ' ' +
+                                    (_user.userDetail?.lastName ?? ''),
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ],

@@ -3,14 +3,12 @@ import 'dart:convert';
 import 'package:packaging_machinery/model/address.dart';
 
 class UserDetail {
-  String name;
-  String? title, firstName, lastName, phone, additionalEmail, company, position;
+  String firstName;
+  String? lastName, phone, additionalEmail, company, position;
   Address address, deliveryAddress;
   Address? invoiceBillAddress, invoiceBillingSettlementAddress;
   UserDetail({
-    required this.name,
-    this.title,
-    this.firstName,
+    required this.firstName,
     this.lastName,
     this.phone,
     this.additionalEmail,
@@ -23,8 +21,6 @@ class UserDetail {
   });
 
   UserDetail copyWith({
-    String? name,
-    String? title,
     String? firstName,
     String? lastName,
     String? phone,
@@ -37,8 +33,6 @@ class UserDetail {
     Address? invoiceBillingSettlementAddress,
   }) {
     return UserDetail(
-      name: name ?? this.name,
-      title: title ?? this.title,
       firstName: firstName ?? this.firstName,
       lastName: lastName ?? this.lastName,
       phone: phone ?? this.phone,
@@ -55,8 +49,6 @@ class UserDetail {
 
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
-      'title': title,
       'firstName': firstName,
       'lastName': lastName,
       'phone': phone,
@@ -73,8 +65,6 @@ class UserDetail {
 
   factory UserDetail.fromMap(Map<String, dynamic> map) {
     return UserDetail(
-      name: map['name'],
-      title: map['title'],
       firstName: map['firstName'],
       lastName: map['lastName'],
       phone: map['phone'],
@@ -100,7 +90,7 @@ class UserDetail {
 
   @override
   String toString() {
-    return 'UserDetail(name: $name, title: $title, firstName: $firstName, lastName: $lastName, phone: $phone additionalEmail: $additionalEmail, company: $company, position: $position, address: $address, deliveryAddress: $deliveryAddress, invoiceBillAddress: $invoiceBillAddress, invoiceBillingSettlementAddress: $invoiceBillingSettlementAddress)';
+    return 'UserDetail(firstName: $firstName, lastName: $lastName, phone: $phone additionalEmail: $additionalEmail, company: $company, position: $position, address: $address, deliveryAddress: $deliveryAddress, invoiceBillAddress: $invoiceBillAddress, invoiceBillingSettlementAddress: $invoiceBillingSettlementAddress)';
   }
 
   @override
@@ -108,8 +98,6 @@ class UserDetail {
     if (identical(this, other)) return true;
 
     return other is UserDetail &&
-        other.name == name &&
-        other.title == title &&
         other.firstName == firstName &&
         other.lastName == lastName &&
         other.phone == phone &&
@@ -125,9 +113,7 @@ class UserDetail {
 
   @override
   int get hashCode {
-    return name.hashCode ^
-        title.hashCode ^
-        firstName.hashCode ^
+    return firstName.hashCode ^
         lastName.hashCode ^
         phone.hashCode ^
         additionalEmail.hashCode ^

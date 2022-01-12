@@ -56,7 +56,9 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
     var data = box.read('user');
     if (data == null) return;
     _user = User.fromJson(data);
-    approverController.text = _user.userDetail!.name;
+    approverController.text = (_user.userDetail?.firstName ?? '') +
+        ' ' +
+        (_user.userDetail!.lastName ?? '');
   }
 
   _cancelOrder(String orderId, OrderData data) {
@@ -242,8 +244,11 @@ class _QuotationOrderScreenState extends State<QuotationOrderScreen> {
                               ),
                               Padding(
                                 padding: const EdgeInsets.only(top: 8.0),
-                                child:
-                                    Text(_user.userDetail!.name.toUpperCase()),
+                                child: Text(
+                                    _user.userDetail!.firstName.toUpperCase() +
+                                        ' ' +
+                                        (_user.userDetail!.lastName ?? '')
+                                            .toUpperCase()),
                               )
                             ]),
                             TableRow(children: [
